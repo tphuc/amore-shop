@@ -9,9 +9,12 @@
   },
   "dependencies": {
     "@geist-ui/react": "^2.2.0",
+    "@geist-ui/react-icons": "^1.0.1",
+    "@supabase/supabase-js": "^1.28.1",
     "next": "12.0.3",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "swr": "^1.0.1"
   },
   "devDependencies": {
     "eslint": "7",
