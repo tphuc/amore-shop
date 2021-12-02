@@ -3,6 +3,7 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import { supabase } from '../frameworks/supabase'
 import { Nav } from '../components/Nav'
+import { Text } from '@geist-ui/react'
 
 
 export default function Home({user}) {
@@ -14,7 +15,7 @@ export default function Home({user}) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Nav/>
-      <p>this is home page</p>
+      <Text px={1}>This is home page</Text>
     </div>
   )
 }
