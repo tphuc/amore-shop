@@ -4,8 +4,9 @@ import styles from '../styles/Home.module.css'
 import { supabase } from '../frameworks/supabase'
 import { Nav } from '../components/Nav'
 import { Text } from '@geist-ui/react'
-
-
+import { Carousel} from 'react-bootstrap'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { width } from 'dom-helpers'
 export default function Home({user}) {
   return (
     <div>
@@ -15,7 +16,71 @@ export default function Home({user}) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Nav/>
-      <Text px={1}>This is home page</Text>
+      <div style = {{
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
+
+        <Carousel style = {{
+          height: '600px',
+          margin: '1% 3%'
+        }}>
+          <Carousel.Item>
+            <img style = {{
+              height: '600px',
+              width: '100%',
+              boxShadow: '0px 0px 10px 10px grey inset'
+            }}
+              className="d-block w-100"
+              src="https://static-buyma-jp.akamaized.net/imgdata/item/210629/0070803294/368058123/428.jpg"
+              alt="First slide"
+            />
+            <Carousel.Caption style = {{
+              color: 'black'
+            }}>
+              <h3>Something</h3>
+              <p>PR for this product</p>
+            </Carousel.Caption>
+          </Carousel.Item>
+          <Carousel.Item>
+            <img style = {{
+              height: '600px',
+              width: '100%',
+              boxShadow: '0px 0px 10px 10px grey inset'
+            }}
+              className="d-block w-100"
+              src="https://static-buyma-jp.akamaized.net/imgdata/item/210629/0070803294/368058123/428.jpg"
+              alt="Second slide"
+            />
+
+            <Carousel.Caption style = {{
+              color: 'black'
+            }}>
+              <h3>Second slide label</h3>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </Carousel.Caption>
+          </Carousel.Item>
+          <Carousel.Item>
+            <img style = {{
+              height: '600px',
+              width: '100%',
+              boxShadow: '0px 0px 10px 10px grey inset'
+            }}
+              className="d-block w-100"
+              src="https://static-buyma-jp.akamaized.net/imgdata/item/210629/0070803294/368058123/428.jpg"
+              alt="Third slide"
+            />
+
+            <Carousel.Caption style = {{
+              color: 'black'
+            }}>
+              <h3>Third slide label</h3>
+              <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur.</p>
+            </Carousel.Caption>
+          </Carousel.Item>
+        </Carousel>
+        <Text px={1}>This is home page</Text>
+      </div>
     </div>
   )
 }

@@ -1,0 +1,13 @@
+import Fieldset from './fieldset';
+import FieldsetTitle from './fieldset-title';
+import FieldsetSubtitle from './fieldset-subtitle';
+import FieldsetFooter from './fieldset-footer';
+import FieldsetGroup from './fieldset-group';
+import FieldsetContent from './fieldset-content';
+Fieldset.Title = FieldsetTitle;
+Fieldset.Subtitle = FieldsetSubtitle;
+Fieldset.Footer = FieldsetFooter;
+Fieldset.Group = FieldsetGroup;
+Fieldset.Content = FieldsetContent;
+Fieldset.Body = FieldsetContent;
+export default Fieldset;

@@ -1,0 +1,11 @@
+declare const justify: ["flex-start", "center", "flex-end", "space-between", "space-around", "space-evenly"];
+export declare type GridJustify = typeof justify[number];
+declare const alignItems: ["flex-start", "center", "flex-end", "stretch", "baseline"];
+export declare type GridAlignItems = typeof alignItems[number];
+declare const alignContent: ["stretch", "center", "flex-start", "flex-end", "space-between", "space-around"];
+export declare type GridAlignContent = typeof alignContent[number];
+declare const direction: ["row", "row-reverse", "column", "column-reverse"];
+export declare type GridDirection = typeof direction[number];
+declare const wrap: ["nowrap", "wrap", "wrap-reverse"];
+export declare type GridWrap = typeof wrap[number];
+export {};
