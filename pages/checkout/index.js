@@ -1,10 +1,9 @@
 import React from "react";
-import { Button, Input, Radio, Spacer, Text } from "@geist-ui/react";
-import './index.css'
-import CustomInput from "./CustomInput";
-import { Edit3, X } from "@geist-ui/react-icons";
-import CustomField from "./CustomField";
-import ErrorMessage from "./ErrorMessage";
+import { Button, Drawer, Input, Radio, Spacer, Text } from "@geist-ui/react";
+import { Edit3, X, ArrowUp } from "@geist-ui/react-icons";
+import CustomInput from "../../components/CustomInput";
+import CustomField from "../../components/CustomField";
+import ErrorMessage from "../../components/ErrorMessage";
 
 const CheckOut = () => {
   const customerData = {
@@ -48,8 +47,15 @@ const CheckOut = () => {
       color: "Red",
       size: "XS",
       price: 29.5,
-      total: 59,
-      image: "image.jpg"
+      image: "insert image"
+    },
+    {
+      name: "Denim Shorts High Waist",
+      quantity: 2,
+      color: "Blue",
+      size: "XL",
+      price: 39.5,
+      image: "insert image"
     },
     {
       name: "Rib-knit Turtleneck Sweater",
@@ -57,8 +63,7 @@ const CheckOut = () => {
       color: "Red",
       size: "XS",
       price: 45.5,
-      total: 136.5,
-      image: "image.jpg"
+      image: "insert image"
     },
     {
       name: "Draped Camisole Top",
@@ -66,8 +71,7 @@ const CheckOut = () => {
       color: "Red",
       size: "XS",
       price: 186.45,
-      total: 186.45,
-      image: "image.jpg"
+      image: "insert image"
     }
   ];
 
@@ -75,19 +79,23 @@ const CheckOut = () => {
   const [current, setCurrent] = React.useState(0);
   const [currentError, setCurrentError] = React.useState(false);
   const [havingData, setHavingData] = React.useState([false, false, false]);
-  // const [clientWindowHeight, setClientWindowHeight] = React.useState("");
-  // const [fixedBill, setFixedBill] = React.useState(false);
-  // React.useEffect(() => {
-  //   window.addEventListener("scroll", handleScroll);
-  //   return () => window.removeEventListener("scroll", handleScroll);
-  // });
-  // const handleScroll = () => {
-  //   setClientWindowHeight(window.scrollY);
-  // };
-  // React.useEffect(() => {
-  //   setFixedBill(clientWindowHeight < 50 ? true : false); //50 = top height to div
-  // }, [clientWindowHeight]);
-
+  const [drawerShown, setDrawerShown] = React.useState(false);
+  const [showBackToTop, setShowBackToTop] = React.useState(false);
+  React.useEffect(() => {
+    window.addEventListener("scroll", () => {
+      if (window.pageYOffset > 10) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    });
+  }, []);
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
   // ------------------------ state - data ------------------------ //
   const [tempInformation, setTempInformation] = React.useState({
     firstName: customerData.firstName,
@@ -116,7 +124,8 @@ const CheckOut = () => {
 
   const [billSubTotal] = React.useState(() => {
     let res = 0;
-    for (let i = 0; i < productData.length; i++) res += productData[i].price;
+    for (let i = 0; i < productData.length; i++)
+      res += productData[i].price * productData[i].quantity;
     return res;
   });
 
@@ -311,26 +320,174 @@ const CheckOut = () => {
   };
 
   return (
-    <div className="checkout">
-      <div className="checkout-left">
+    <div
+      style={{
+        backgroundColor: "#f8f8f8",
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignContent: "start",
+        width: "100vw"
+      }}
+    >
+      {showBackToTop && (
+        <div
+          onClick={scrollToTop}
+          style={{
+            position: "fixed",
+            right: "30px",
+            bottom: "30px",
+            width: "30px",
+            height: "30px",
+            cursor: "pointer",
+            border: "1px solid black",
+            borderRadius: "100px",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <ArrowUp size={16} />
+        </div>
+      )}
+
+      <Drawer
+        visible={drawerShown}
+        onClose={() => setDrawerShown(false)}
+        placement="right"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "start",
+          alignItems: "center",
+          padding: "15px 30px",
+          borderRadius: 0
+        }}
+      >
+        <Drawer.Content>
+          {productData.map((item, index) => (
+            <div
+              style={{
+                border: "1px solid #eaeaea",
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "start",
+                padding: "15px",
+                marginBottom: "15px"
+              }}
+            >
+              <div
+                style={{
+                  objectFit: "cover",
+                  width: "130px",
+                  height: "180px",
+                  backgroundColor: "pink",
+                  marginRight: "15px"
+                }}
+              >
+                {item.image}
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  width: "250px"
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 500,
+                    cursor: "default",
+                    textTransform: "uppercase"
+                  }}
+                >
+                  {item.name}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 500,
+                    color: "gray",
+                    cursor: "default"
+                  }}
+                >
+                  {item.color}
+                  {" · "}
+                  {item.size}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 500,
+                    cursor: "default"
+                  }}
+                >
+                  ${item.price.toFixed(2)}
+                  {" × "}
+                  {item.quantity}
+                </Text>
+              </div>
+            </div>
+          ))}
+        </Drawer.Content>
+      </Drawer>
+      <Spacer w={15} />
+      <div
+        className="checkout-left"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "start",
+          alignItems: "center",
+          overflow: "hidden",
+          borderTop: "15px solid #f8f8f8",
+          borderLeft: "15px solid #f8f8f8",
+          width: "60%"
+        }}
+      >
         {current === 0 ? (
-          <div className="checkout-card">
-            <div className="checkout-card-title">
+          <div
+            className="checkout-card"
+            style={{
+              width: "100%",
+              marginBottom: "15px",
+              padding: "30px 0",
+              backgroundColor: "white",
+              overflow: "hidden"
+            }}
+          >
+            <div
+              className="checkout-card-title"
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                margin: "0 30px"
+              }}
+            >
               <Text h4 style={{ cursor: "default" }}>
                 Information
               </Text>
               {havingData[0] && (
-                <X
-                  className="checkout-card-title-btn"
-                  size={20}
-                  onClick={onClickCancelInformation}
-                />
+                <div style={{ margin: "0 0 0.7rem 0" }}>
+                  <X
+                    className="checkout-card-title-btn"
+                    style={{ cursor: "pointer" }}
+                    size={20}
+                    onClick={onClickCancelInformation}
+                  />
+                </div>
               )}
             </div>
             <div
               onClick={() => {
                 setCurrentError(false);
               }}
+              style={{ margin: "0 30px" }}
             >
               <CustomInput
                 label="First name"
@@ -365,7 +522,16 @@ const CheckOut = () => {
                 }}
               />
             </div>
-            <div className="checkout-button">
+            <div
+              className="checkout-button"
+              style={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
               {currentError && (
                 <ErrorMessage message="Some fields are missing or invalid!" />
               )}
@@ -388,50 +554,93 @@ const CheckOut = () => {
             </div>
           </div>
         ) : (
-          <div className="checkout-card">
-            <div className="checkout-card-title">
+          <div
+            className="checkout-card"
+            style={{
+              width: "100%",
+              marginBottom: "15px",
+              padding: "30px 0",
+              backgroundColor: "white",
+              overflow: "hidden"
+            }}
+          >
+            <div
+              className="checkout-card-title"
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                margin: "0 30px"
+              }}
+            >
               <Text h4 style={{ cursor: "default" }}>
                 Information
               </Text>
               {havingData[0] && (
-                <Edit3
-                  className="checkout-card-title-btn"
-                  size={20}
-                  onClick={() => {
-                    setCurrent(0);
-                  }}
-                />
+                <div style={{ margin: "0 0 0.7rem 0" }}>
+                  <Edit3
+                    className="checkout-card-title-btn"
+                    style={{ cursor: "pointer" }}
+                    size={20}
+                    onClick={() => {
+                      setCurrent(0);
+                    }}
+                  />{" "}
+                </div>
               )}
             </div>
             {havingData[0] && (
-              <>
+              <div style={{ margin: "0 30px" }}>
                 <CustomField label="First name" value={information.firstName} />
                 <CustomField label="Last name" value={information.lastName} />
                 <CustomField label="Email" value={information.email} />
                 <CustomField label="Phone number" value={information.phone} />
-              </>
+              </div>
             )}
           </div>
         )}
 
         {current === 1 ? (
-          <div className="checkout-card">
-            <div className="checkout-card-title">
+          <div
+            className="checkout-card"
+            style={{
+              width: "100%",
+              marginBottom: "15px",
+              padding: "30px 0",
+              backgroundColor: "white",
+              overflow: "hidden"
+            }}
+          >
+            <div
+              className="checkout-card-title"
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                margin: "0 30px"
+              }}
+            >
               <Text h4 style={{ cursor: "default" }}>
                 Billing address
               </Text>
               {havingData[1] && (
-                <X
-                  className="checkout-card-title-btn"
-                  size={20}
-                  onClick={onClickCancelBillingAddress}
-                />
+                <div style={{ margin: "0 0 0.7rem 0" }}>
+                  <X
+                    className="checkout-card-title-btn"
+                    style={{ cursor: "pointer" }}
+                    size={20}
+                    onClick={onClickCancelBillingAddress}
+                  />
+                </div>
               )}
             </div>
             <div
               onClick={() => {
                 setCurrentError(false);
               }}
+              style={{ margin: "0 30px" }}
             >
               <CustomInput
                 label="Street address"
@@ -485,7 +694,16 @@ const CheckOut = () => {
                 }}
               />
             </div>
-            <div className="checkout-button">
+            <div
+              className="checkout-button"
+              style={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
               {currentError && (
                 <ErrorMessage message="Some fields are missing or invalid!" />
               )}
@@ -507,23 +725,44 @@ const CheckOut = () => {
             </div>
           </div>
         ) : (
-          <div className="checkout-card">
-            <div className="checkout-card-title">
+          <div
+            className="checkout-card"
+            style={{
+              width: "100%",
+              marginBottom: "15px",
+              padding: "30px 0",
+              backgroundColor: "white",
+              overflow: "hidden"
+            }}
+          >
+            <div
+              className="checkout-card-title"
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                margin: "0 30px"
+              }}
+            >
               <Text h4 style={{ cursor: "default" }}>
                 Billing address
               </Text>
               {havingData[1] && (
-                <Edit3
-                  className="checkout-card-title-btn"
-                  size={20}
-                  onClick={() => {
-                    setCurrent(1);
-                  }}
-                />
+                <div style={{ margin: "0 0 0.7rem 0" }}>
+                  <Edit3
+                    className="checkout-card-title-btn"
+                    style={{ cursor: "pointer" }}
+                    size={20}
+                    onClick={() => {
+                      setCurrent(1);
+                    }}
+                  />{" "}
+                </div>
               )}
             </div>
             {havingData[1] && (
-              <>
+              <div style={{ margin: "0 30px" }}>
                 <CustomField
                   label="Street address"
                   value={billingAddress.streetAddress}
@@ -547,42 +786,87 @@ const CheckOut = () => {
                   value={billingAddress.zip}
                   required
                 />
-              </>
+              </div>
             )}
           </div>
         )}
         {current === 2 ? (
-          <div className="checkout-card">
+          <div
+            className="checkout-card"
+            style={{
+              width: "100%",
+              marginBottom: "15px",
+              padding: "30px 0",
+              backgroundColor: "white",
+              overflow: "hidden"
+            }}
+          >
             <div
               className="checkout-card-title"
               style={{
-                marginBottom: 12
+                marginBottom: 12,
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                margin: "0 30px"
               }}
             >
               <Text h4 style={{ cursor: "default" }}>
                 Shipping
               </Text>
               {havingData[2] && (
-                <X
-                  className="checkout-card-title-btn"
-                  size={20}
-                  onClick={onClickCancelShipping}
-                />
+                <div style={{ margin: "0 0 0.7rem 0" }}>
+                  <X
+                    className="checkout-card-title-btn"
+                    style={{ cursor: "pointer" }}
+                    size={20}
+                    onClick={onClickCancelShipping}
+                  />
+                </div>
               )}
             </div>
             <Radio.Group value={tempShippingIdx} onChange={onChangeShipping}>
               {shippingData.map((item, index) => (
                 <div
-                  className={
+                  style={
                     tempShippingIdx === index
-                      ? "checkout-shipping-focus"
-                      : "checkout-shipping"
+                      ? {
+                          backgroundColor: "white",
+                          height: "100px",
+                          display: "flex",
+                          flexDirection: "row",
+                          justifyContent: "start",
+                          alignItems: "center",
+                          padding: "0 30px",
+                          margin: "0 30px 15px 30px",
+                          overflow: "hidden",
+                          borderRadius: "5px",
+                          cursor: "pointer",
+                          minWidth: "200px",
+                          outline: "1px solid black"
+                        }
+                      : {
+                          backgroundColor: "white",
+                          height: "100px",
+                          display: "flex",
+                          flexDirection: "row",
+                          justifyContent: "start",
+                          alignItems: "center",
+                          padding: "0 30px",
+                          margin: "0 30px 15px 30px",
+                          overflow: "hidden",
+                          borderRadius: "5px",
+                          cursor: "pointer",
+                          minWidth: "200px",
+                          outline: "1px solid #eaeaea"
+                        }
                   }
                   onClick={() => onChangeShipping(index)}
                 >
                   <Radio scale={4 / 3} value={index}>
                     <Spacer w={2} />
-                    <div className="checkout-shipping-detail">
+                    <div syle={{ display: "flex", flexDirection: "column" }}>
                       <Text
                         style={{
                           fontSize: 12,
@@ -620,7 +904,16 @@ const CheckOut = () => {
                 </div>
               ))}
             </Radio.Group>
-            <div className="checkout-button">
+            <div
+              className="checkout-button"
+              style={{
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
               <Button
                 auto
                 style={{
@@ -639,23 +932,50 @@ const CheckOut = () => {
             </div>
           </div>
         ) : (
-          <div className="checkout-card">
-            <div className="checkout-card-title">
+          <div
+            className="checkout-card"
+            style={{
+              width: "100%",
+              marginBottom: "15px",
+              padding: "30px 0",
+              backgroundColor: "white",
+              overflow: "hidden"
+            }}
+          >
+            <div
+              className="checkout-card-title"
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                margin: "0 30px"
+              }}
+            >
               <Text h4 style={{ cursor: "default" }}>
                 Shipping
               </Text>
               {havingData[2] && (
-                <Edit3
-                  className="checkout-card-title-btn"
-                  size={20}
-                  onClick={() => {
-                    setCurrent(2);
-                  }}
-                />
+                <div style={{ margin: "0 0 0.7rem 0" }}>
+                  <Edit3
+                    className="checkout-card-title-btn"
+                    style={{ cursor: "pointer" }}
+                    size={20}
+                    onClick={() => {
+                      setCurrent(2);
+                    }}
+                  />
+                </div>
               )}
             </div>
             {havingData[2] && (
-              <div className="checkout-shipping-detail">
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  margin: "0 30px"
+                }}
+              >
                 <CustomField
                   label={
                     shippingData[shippingIdx].name +
@@ -678,173 +998,285 @@ const CheckOut = () => {
           </div>
         )}
       </div>
-      {/* <div className={fixedBill ? "checkout-right" : "checkout-right-fixed"}> */}
-      <div className="checkout-right">
-        <div className="checkout-card">
-          <div className="checkout-voucher">
-            {isApplied > 0 ? (
-              <>
-                <Input
-                  scale={4 / 3}
-                  width="100%"
-                  readOnly
-                  style={{ cursor: "default", pointerEvents: "none" }}
-                  initialValue={voucherCode}
-                />
-
-                <Spacer w={1} />
-                <Button
-                  auto
-                  style={{
-                    borderRadius: 0,
-                    textTransform: "none",
-                    width: "225px",
-                    color: "black",
-                    border: "1px solid #eaeaea"
-                  }}
-                  onClick={onClickRemoveVoucher}
-                >
-                  Remove voucher
-                </Button>
-              </>
-            ) : (
-              <>
-                <Input
-                  scale={4 / 3}
-                  width="100%"
-                  type={isApplied < 0 ? "error" : null}
-                  value={voucherCode}
-                  placeholder="Enter code"
-                  style={{ cursor: "default" }}
-                  onClick={() => setIsApplied(0)}
-                  onChange={(e) => onChangeVoucher(e.target.value)}
-                />
-                <Spacer w={1} />
-                <Button
-                  auto
-                  style={{
-                    borderRadius: 0,
-                    textTransform: "none",
-                    width: "225px",
-                    backgroundColor: "white",
-                    color: "black",
-                    border: "1px solid #eaeaea"
-                  }}
-                  onClick={onClickApplyVoucher}
-                >
-                  Apply voucher
-                </Button>
-              </>
-            )}
-          </div>
-          <div className="checkout-bill-divider" />
-          <div className="checkout-bill-detail">
-            <Text
+      <div
+        className="checkout-right"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "start",
+          alignItems: "center",
+          overflow: "hidden",
+          borderTop: "15px solid #f8f8f8",
+          borderLeft: "15px solid #f8f8f8",
+          width: "40%",
+          borderRight: "15px solid #f8f8f8"
+        }}
+      >
+        <div
+          className="checkout-card"
+          style={{
+            width: "100%",
+            marginBottom: "15px",
+            backgroundColor: "white",
+            overflow: "hidden"
+          }}
+        >
+          <div style={{ margin: "30px" }}>
+            <div
               style={{
-                fontSize: 12,
-                fontWeight: 500,
-                color: "gray",
-                cursor: "default"
-              }}
-            >
-              Sub total
-            </Text>
-            <Text
-              style={{
-                fontSize: 14,
-                fontWeight: 500,
-                cursor: "default"
-              }}
-            >
-              ${billSubTotal.toFixed(2)}
-            </Text>
-          </div>
-          <div className="checkout-bill-detail">
-            <Text
-              style={{
-                fontSize: 12,
-                fontWeight: 500,
-                color: "gray",
-                cursor: "default"
-              }}
-            >
-              Discount
-            </Text>
-            <Text
-              style={{
-                fontSize: 14,
-                fontWeight: 500,
-                cursor: "default",
-                color: "red"
-              }}
-            >
-              - ${billDiscount.toFixed(2)}
-            </Text>
-          </div>
-          <div className="checkout-bill-detail">
-            <Text
-              style={{
-                fontSize: 12,
-                fontWeight: 500,
-                color: "gray",
-                cursor: "default"
-              }}
-            >
-              Shipping
-            </Text>
-            <Text
-              style={{
-                fontSize: 14,
-                fontWeight: 500,
-                cursor: "default"
-              }}
-            >
-              {havingData[2]
-                ? "$" + shippingData[shippingIdx].fee.toFixed(2)
-                : "TBD"}
-            </Text>
-          </div>
-          <div className="checkout-bill-divider" />
-          <div className="checkout-bill-detail">
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: 500,
-                cursor: "default"
-              }}
-            >
-              Total
-            </Text>
-            <Text
-              style={{
-                fontSize: 16,
-                fontWeight: 500,
-                cursor: "default"
-              }}
-            >
-              {havingData[2] ? "$" + getTotal().toFixed(2) : "TBD"}
-            </Text>
-          </div>
-          <div className="checkout-bill-detail">
-            <Button
-              className="checkout-btn"
-              style={{
-                borderRadius: 0,
-                textTransform: "none",
-
-                marginTop: 15,
                 width: "100%",
-                height: "50px",
-                backgroundColor: "black",
-                color: "white",
-                border: 0
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "30px"
               }}
             >
-              Complete your purchase
-            </Button>
+              {isApplied > 0 ? (
+                <>
+                  <Input
+                    scale={4 / 3}
+                    width="100%"
+                    readOnly
+                    style={{ cursor: "default", pointerEvents: "none" }}
+                    initialValue={voucherCode}
+                  />
+
+                  <Spacer w={1} />
+                  <Button
+                    auto
+                    style={{
+                      borderRadius: 0,
+                      textTransform: "none",
+                      width: "225px",
+                      color: "black",
+                      border: "1px solid #eaeaea"
+                    }}
+                    onClick={onClickRemoveVoucher}
+                  >
+                    Remove voucher
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Input
+                    scale={4 / 3}
+                    width="100%"
+                    type={isApplied < 0 ? "error" : null}
+                    value={voucherCode}
+                    placeholder="Enter code"
+                    style={{ cursor: "default" }}
+                    onClick={() => setIsApplied(0)}
+                    onChange={(e) => onChangeVoucher(e.target.value)}
+                  />
+                  <Spacer w={1} />
+                  <Button
+                    auto
+                    style={{
+                      borderRadius: 0,
+                      textTransform: "none",
+                      width: "225px",
+                      backgroundColor: "white",
+                      color: "black",
+                      border: "1px solid #eaeaea"
+                    }}
+                    onClick={onClickApplyVoucher}
+                  >
+                    Apply voucher
+                  </Button>
+                </>
+              )}
+            </div>
+            <div
+              style={{
+                width: "100%",
+                height: "1px",
+                borderBottom: "1px solid gray",
+                margin: "15px 0"
+              }}
+            />
+            <div
+              className="checkout-bill-detail"
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: "gray",
+                  cursor: "default"
+                }}
+              >
+                Sub total
+              </Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: "default"
+                }}
+              >
+                ${billSubTotal.toFixed(2)}
+              </Text>
+            </div>
+            <div
+              className="checkout-bill-detail"
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: "gray",
+                  cursor: "default"
+                }}
+              >
+                Discount
+              </Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: "default",
+                  color: "red"
+                }}
+              >
+                - ${billDiscount.toFixed(2)}
+              </Text>
+            </div>
+            <div
+              className="checkout-bill-detail"
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                  color: "gray",
+                  cursor: "default"
+                }}
+              >
+                Shipping
+              </Text>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: 500,
+                  cursor: "default"
+                }}
+              >
+                {havingData[2]
+                  ? "$" + shippingData[shippingIdx].fee.toFixed(2)
+                  : "TBD"}
+              </Text>
+            </div>
+            <div
+              style={{
+                width: "100%",
+                height: "1px",
+                borderBottom: "1px solid gray",
+                margin: "15px 0"
+              }}
+            />
+            <div
+              className="checkout-bill-detail"
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: 500,
+                  cursor: "default"
+                }}
+              >
+                Total
+              </Text>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: 500,
+                  cursor: "default"
+                }}
+              >
+                {havingData[2] ? "$" + getTotal().toFixed(2) : "TBD"}
+              </Text>
+            </div>
+            <div
+              className="checkout-bill-detail"
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}
+            >
+              <Button
+                auto
+                style={{
+                  textTransform: "none",
+                  width: "100%",
+                  backgroundColor: "white",
+                  color: "black",
+                  border: 0,
+                  fontSize: 12,
+                  fontWeight: 500,
+                  textDecoration: "underline"
+                }}
+                onClick={() => setDrawerShown(true)}
+              >
+                View your cart
+              </Button>
+            </div>
+            <div
+              className="checkout-bill-detail"
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center"
+              }}
+            >
+              <Button
+                className="checkout-btn"
+                style={{
+                  borderRadius: 0,
+                  textTransform: "none",
+                  marginTop: 15,
+                  width: "100%",
+                  height: "50px",
+                  backgroundColor: "black",
+                  color: "white",
+                  border: 0
+                }}
+                onClick={() => {}}
+              >
+                Complete your purchase
+              </Button>
+            </div>
           </div>
         </div>
       </div>
+      <Spacer w={15} />
     </div>
   );
 };
