@@ -118,7 +118,7 @@ export const Popupform = ({open, onClose, title}) => {
             default:
                 break;
         }
-    }, [query])
+    },)
     const handler = (value) => {
         console.log(value)
     }

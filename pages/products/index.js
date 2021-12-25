@@ -68,27 +68,3 @@ export default function Products(){
     <Popupform open={popUpForm} onClose={() => {setPopUpForm(false)}} title={popUpTopic}></Popupform>
   </div>
 }
-
-export async function getStaticProps() {
-  
-}
-let filterData = {
-  CATEGORIES: [
-    {
-      id: 'cate1',
-      title: 'Handbag'
-  },
-  {
-      id: 'cate2',
-      title: 'Trousers'
-  },
-  {
-      id: 'cate3',
-      title: 'T-Shirt'
-  },
-  {
-      id: 'cate4',
-      title: 'Shoes'
-  }
-  ]
-}

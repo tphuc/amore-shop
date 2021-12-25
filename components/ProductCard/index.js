@@ -16,7 +16,7 @@ export default function ProductCard({
 }) {
 
   const { palette } = useTheme()
-  return <Link href={`/product/${data?.id}`} passHref={false} width='100%' style={{display:"flex", width:width, margin:10, justifyContent:"center", alignItems:"center"}} >
+  return <Link href={`/detail/${data?.id}`} passHref width='100%' style={{display:"flex", width:width, margin:10, justifyContent:"center", alignItems:"center"}} >
     <div style={{ border: "none", position:"relative", cursor:"pointer", maxWidth:width  }} width="100%" >
         <div style={{position:"absolute", zIndex:2, top:5, right:0}}>
             <Button onClick={(e) => {e.preventDefault()}} type='abort' iconRight={<Heart />} px={0.6}  auto  />

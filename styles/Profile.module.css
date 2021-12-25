@@ -1,0 +1,60 @@
+.profilecontainer {
+  width: 100%;
+}
+.profileusername {
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+}
+.profile {
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid lightgray;
+}
+.profileusericon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border: 2px solid black;
+  border-radius: 50%;
+}
+.profilecontent {
+  display: flex;
+  flex-direction: column;
+}
+.profilebutton {
+  width: 100%;
+  color: white;
+  background-color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  margin: 10px 0px;
+  border: 2px solid black;
+  -webkit-transition: 0.5s all;
+  -webkit-transition-delay: 0s;
+  -moz-transition: 0.5s all;
+  -moz-transition-delay: 5s;
+  -ms-transition: 0.5s all;
+  -ms-transition-delay: 5s;
+  -o-transition: 0.5s all;
+  -o-transition-delay: 5s;
+  transition: 0.5s all;
+  transition-delay: 0s;
+}
+.profilebutton:hover {
+  background-color: white;
+  border: 2px solid black;
+  color: black;
+  -webkit-transition-delay: 0s;
+  -moz-transition-delay: 0s;
+  -ms-transition-delay: 0s;
+  -o-transition-delay: 0s;
+  transition-delay: 0s;
+}
