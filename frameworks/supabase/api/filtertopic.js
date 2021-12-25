@@ -2,7 +2,7 @@ import useSWR from 'swr'
 
 
 
-const ENDPOINT = 'categories'
+const ENDPOINT = 'filtertopic'
 
 
 
@@ -11,30 +11,30 @@ const fetcher = async (ENDPOINT) => {
     // for now use static data to display
     return ([
         {
-            label: 'NEW',
+            label: 'CATEGORIES',
             id: 1
         },
         {
-            label: 'MEN',
+            label: 'COLLECTIONS',
             id: 2
         },
         {
-            label: 'WOMAN',
+            label: 'COLORS',
             id: 3
         },
         {
-            label: 'HOT TREND',
+            label: 'STYLES',
             id: 4
         },
         {
-            label: 'HOLIDAY',
+            label: 'BRANDS',
             id: 5
         }
     ])
    
 }
 
-export function useCategories() {
+export function useFilterTopic() {
     const { data, error, mutate } = useSWR(ENDPOINT, fetcher)
     return {
         mutate,

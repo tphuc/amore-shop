@@ -1,15 +1,17 @@
-import { Button, Divider, useMediaQuery, useModal, useTheme, Modal, ButtonDropdown } from '@geist-ui/react';
+import { Button, Divider, useMediaQuery, useModal, useTheme, Modal, Input } from '@geist-ui/react';
 import React from 'react';
 import Link from 'next/link'
 import {Dropdown} from 'react-bootstrap'
 import { useCategories } from '../../frameworks/supabase/api/categories';
-import { Menu, ShoppingBag, User } from '@geist-ui/react-icons';
+import { Menu, ShoppingBag, User, Search } from '@geist-ui/react-icons';
+import '../../styles/Nav.module.css'
 export function Nav({ ...props }) {
     const { data: categories } = useCategories()
     //const [anchorMenu, setAnchorMenu] = React.useState(null)
     const theme = useTheme();
     const isMobile = useMediaQuery('mobile')
     const { visible, setVisible, bindings } = useModal()
+    const [searchInfo, setSearchInfo] = React.useState('')
     return <>
         <style jsx>
             {`
@@ -44,12 +46,28 @@ export function Nav({ ...props }) {
             }
         `}
         </style>
-        <div className='nav-container' >
+        <div className="nav-container" style = {{
+            marginLeft: '2%',
+        }}>
             <div className='logo-container' >
-                <Link href='/'><p>AMORE</p></Link>
+                <Link href='/'><p style = {{
+                    fontWeight: 'bold',
+                    fontSize: '20px'
+                }}>AMORE</p></Link>
             </div>
-            {!isMobile && categories?.map((item, id) => <Link key={id} href={{ pathname:"/products", query: { category: item.id }  }}><a >{item.label}</a></Link>)}
+            {!isMobile && categories?.map((item, id) =>
+            <div style = {{
+                padding: '0% 1%'
+            }}> <Link key={id} href={{ pathname:"/products", query: { category: item.id }  }}><a >{item.label}</a></Link>
+            </div>)}
             <div style={{ marginLeft: "auto", marginRight: "5%", display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                <Input placeholder = "product" style = {{
+                    width: '400px',
+                    borderRadius: '50px'
+                }} icon = {<Search/>} onChange = {(e) => {
+                    setSearchInfo(e.target.value)
+                }}>
+                </Input>
                 <Dropdown>
                     <Dropdown.Toggle variant="success" id="dropdown-basic" style = {{
                         backgroundColor: 'white',
@@ -77,9 +95,12 @@ export function Nav({ ...props }) {
             }
         </div>
         <Divider style={{ margin: 0, padding: 0 }} />
-       
+        <div style = {{
+            display: 'flex',
+            flexDirection: 'row'
+        }}> 
 
-
+        </div>
     </>
 }
 

@@ -23,7 +23,7 @@ export default function Home({user}) {
 
         <Carousel style = {{
           height: '600px',
-          margin: '1% 3%'
+          margin: '1% 0%'
         }}>
           <Carousel.Item>
             <img style = {{
@@ -79,7 +79,22 @@ export default function Home({user}) {
             </Carousel.Caption>
           </Carousel.Item>
         </Carousel>
-        <Text px={1}>This is home page</Text>
+        <div style = {{
+          display: 'flex',
+          flexDirection: 'row'
+        }}>
+          <div style = {{
+            display: 'grid',
+
+          }}>
+
+          </div>
+          <div style = {{
+            
+          }}>
+            <img src = ""></img>
+          </div>
+        </div>
       </div>
     </div>
   )
