@@ -1,4 +1,5 @@
 import useSWR from 'swr'
+import { supabase } from '..'
 
 
 
@@ -6,32 +7,35 @@ const ENDPOINT = 'products'
 
 
 
-const fetcher = async (ENDPOINT) => {
+const fetcher = async (ENDPOINT, filter) => {
+    let res = supabase.from('products').select(`
+        *,
+        categories!inner(*) (
+            *
+        )
+    `)
 
-    // for now use static data to display
-    return ([
-        {
-            label: 'Short Monogram Wool Elegant Style Peacoats 1',
-            id: 1
-        },
-        {
-            label: 'Short Monogram Wool Elegant Style Peacoats 2',
-            id: 2
-        },
-        {
-            label: 'Short Monogram Wool Elegant Style Peacoats 3',
-            id: 3
-        },
-        {
-            label: 'Short Monogram Wool Elegant Style Peacoats 4',
-            id: 3
+    for (let k in filter) {
+        if (filter[k]) {
+            switch (k) {
+                case 'label':
+                    res = res.filter('label', 'ilike', `%${filter[k]}%`)
+                    break
+                case 'category':
+                    res = res.eq('categories.id', filter[k])
+                    break
+            }
         }
-    ])
-   
+    }
+    console.log(res)
+    res = await res;
+    
+    return res.data
+
 }
 
-export function useProducts() {
-    const { data, error, mutate } = useSWR(ENDPOINT, fetcher)
+export function useProducts(filter) {
+    const { data, error, mutate } = useSWR([ENDPOINT, filter], fetcher)
     return {
         mutate,
         data: data,

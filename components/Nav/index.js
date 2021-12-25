@@ -1,7 +1,7 @@
 import { Button, Divider, useMediaQuery, useModal, useTheme, Modal, ButtonDropdown } from '@geist-ui/react';
 import React from 'react';
 import Link from 'next/link'
-import {Dropdown} from 'react-bootstrap'
+// import {Dropdown} from 'react-bootstrap'
 import { useCategories } from '../../frameworks/supabase/api/categories';
 import { Menu, ShoppingBag, User } from '@geist-ui/react-icons';
 export function Nav({ ...props }) {
@@ -22,6 +22,7 @@ export function Nav({ ...props }) {
                 display: flex;
                 flex-direction: row;
                 align-items: center;
+                background:#fff;
             }
 
             a {
@@ -48,9 +49,9 @@ export function Nav({ ...props }) {
             <div className='logo-container' >
                 <Link href='/'><p>AMORE</p></Link>
             </div>
-            {!isMobile && categories?.map((item, id) => <Link key={id} href={{ pathname:"/products", query: { category: item.id }  }}><a >{item.label}</a></Link>)}
-            <div style={{ marginLeft: "auto", marginRight: "5%", display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-                <Dropdown>
+            {!isMobile && categories?.map((item, id) => <Link key={id} href={{ pathname: "/products", query: { category: item.id } }}><a >{item.label}</a></Link>)}
+            <div style={{ marginLeft: "auto", marginRight: "5%", display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                {/* <Dropdown>
                     <Dropdown.Toggle variant="success" id="dropdown-basic" style = {{
                         backgroundColor: 'white',
                         height: '60px',
@@ -66,18 +67,18 @@ export function Nav({ ...props }) {
                         <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
                         <Dropdown.Item href="/logout">Logout</Dropdown.Item>
                     </Dropdown.Menu>
-                </Dropdown>
+                </Dropdown> */}
 
                 <Button type='abort' iconRight={<ShoppingBag />} auto px={0.6}></Button>
                 {isMobile && <Button onClick={() => setVisible(!visible)} type='abort' iconRight={<Menu />} auto px={0.6} />}
             </div>
-            {visible && isMobile && <div className='nav-modal' style={{ width: "100vw", position: "fixed", bottom: 0, left: 0, boxSizing: "border-box", display:"flex", flexDirection:"column", alignItems:"center", height: "calc(100vh - 60px)", background: theme.palette.background, margin: 0 }}>
-                    {categories?.map((item, id) => <Link key={id} href={{ pathname:"/products", query: { category: item.id }}}><a >{item.label}</a></Link>)} 
+            {visible && isMobile && <div className='nav-modal' style={{ width: "100vw", position: "fixed", bottom: 0, left: 0, boxSizing: "border-box", display: "flex", flexDirection: "column", alignItems: "center", height: "calc(100vh - 60px)", background: theme.palette.background, margin: 0 }}>
+                {categories?.map((item, id) => <Link key={id} href={{ pathname: "/products", query: { category: item.id } }}><a >{item.label}</a></Link>)}
             </div>
             }
         </div>
         <Divider style={{ margin: 0, padding: 0 }} />
-       
+
 
 
     </>

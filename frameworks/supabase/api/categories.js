@@ -1,4 +1,5 @@
 import useSWR from 'swr'
+import { supabase } from '..'
 
 
 
@@ -8,17 +9,8 @@ const ENDPOINT = 'categories'
 
 const fetcher = async (ENDPOINT) => {
 
-    // for now use static data to display
-    return ([
-        {
-            label: 'MEN',
-            id: 1
-        },
-        {
-            label: 'WOMAN',
-            id: 2
-        }
-    ])
+    let res = await supabase.from(ENDPOINT).select('*')
+    return res.data
    
 }
 

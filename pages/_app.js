@@ -5,7 +5,8 @@ import { Themes } from '@geist-ui/react';
 const myTheme = Themes.createFromLight({
   "type": "Custom",
   "layout": {
-    "radius": "0px"
+    "radius": "0px",
+    "border": "none"
   },
   "palette": {
     // "accents_9": '#00070f',
