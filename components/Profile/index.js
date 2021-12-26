@@ -4,7 +4,7 @@ import styles from '../../styles/Profile.module.css'
 import { User } from '@geist-ui/react-icons'
 import router from 'next/router'
 
-export function Profile({open, onClose}) {
+export function Profile({open, onClose, isLoggedIn}) {
     let user = {
         name: 'David',
         address: '48 Wall Streat'
@@ -37,13 +37,20 @@ export function Profile({open, onClose}) {
                             <div className={styles.profileusericon}>
                                 <User size={60}/>
                             </div>
-                            <p className={styles.profileusername}>{user.name}</p>
+                            {isLoggedIn ? <p className={styles.profileusername}>{user.name}</p> : <div></div>}
+                            
                         </div>
                         <div className={styles.profilecontent}>
-                            <div className={styles.profilebutton} onClick={() => router.push('/profile')}>Profile</div>
-                            <div className={styles.profilebutton}>Setting</div>
-                            <div className={styles.profilebutton}>Help</div>
-                            <div className={styles.profilebutton}>Logout</div>
+                            {isLoggedIn ? <div>
+                                <div className={styles.profilebutton} onClick={() => router.push('/profile')}>Profile</div>
+                                <div className={styles.profilebutton}>Setting</div>
+                                <div className={styles.profilebutton}>Help</div>
+                                <div className={styles.profilebutton}>Logout</div>
+                            </div> : <div>
+                                <div className={styles.profilebutton}>Sign In</div>
+                                <div className={styles.profilebutton}>Sign Up</div>
+                                </div>}
+                            
                         </div>
                     </div>
                 </Drawer.Content>

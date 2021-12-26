@@ -1,9 +1,6 @@
 import { Button, Divider, useMediaQuery, useModal, useTheme, Modal, Input } from '@geist-ui/react';
 import React from 'react';
 import Link from 'next/link'
-import {Dropdown} from 'react-bootstrap'
-import 'bootstrap/dist/css/bootstrap.css';
-import {Drawer} from '@geist-ui/react'
 import { useCategories } from '../../frameworks/supabase/api/categories';
 import { Menu, ShoppingBag, User, Search } from '@geist-ui/react-icons';
 import '../../styles/Nav.module.css'
@@ -30,6 +27,7 @@ export function Nav({ ...props }) {
                 display: flex;
                 flex-direction: row;
                 align-items: center;
+                background:#fff;
             }
 
             a {
@@ -79,14 +77,14 @@ export function Nav({ ...props }) {
                 <Button type='abort' iconRight={<ShoppingBag />} onClick={() => setCartMenu(true)} auto px={0.6}></Button>
                 {isMobile && <Button onClick={() => setVisible(!visible)} type='abort' iconRight={<Menu />} auto px={0.6} />}
             </div>
-            {visible && isMobile && <div className='nav-modal' style={{ width: "100vw", position: "fixed", bottom: 0, left: 0, boxSizing: "border-box", display:"flex", flexDirection:"column", alignItems:"center", height: "calc(100vh - 60px)", background: theme.palette.background, margin: 0 }}>
-                    {categories?.map((item, id) => <Link key={id} href={{ pathname:"/products", query: { category: item.id }}}><a >{item.label}</a></Link>)} 
+            {visible && isMobile && <div className='nav-modal' style={{ width: "100vw", position: "fixed", bottom: 0, left: 0, boxSizing: "border-box", display: "flex", flexDirection: "column", alignItems: "center", height: "calc(100vh - 60px)", background: theme.palette.background, margin: 0 }}>
+                {categories?.map((item, id) => <Link key={id} href={{ pathname: "/products", query: { category: item.id } }}><a >{item.label}</a></Link>)}
             </div>
             }
         </div>
         <Divider style={{ margin: 0, padding: 0 }} />
         <Cart open = {cartMenu} onClose = {() => setCartMenu(false)}/>
-        <Profile open={profileMenu} onClose={() => setProfileMenu(false)}/>
+        <Profile open={profileMenu} onClose={() => setProfileMenu(false)} isLoggedIn={false}/>
     </>
 }
 

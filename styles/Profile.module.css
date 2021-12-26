@@ -22,6 +22,7 @@
   padding: 10px;
   border: 2px solid black;
   border-radius: 50%;
+  margin-bottom: 10px;
 }
 .profilecontent {
   display: flex;
