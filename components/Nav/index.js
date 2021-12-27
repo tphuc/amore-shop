@@ -4,12 +4,18 @@ import Link from 'next/link'
 // import {Dropdown} from 'react-bootstrap'
 import { useCategories } from '../../frameworks/supabase/swr/categories';
 import { Menu, ShoppingBag, User, UserX } from '@geist-ui/react-icons';
+import '../../styles/Nav.module.css'
+import {Cart} from '../Cart'
+import { Profile } from '../Profile';
 export function Nav({ ...props }) {
     const { data: categories } = useCategories()
     //const [anchorMenu, setAnchorMenu] = React.useState(null)
     const theme = useTheme();
     const isMobile = useMediaQuery('mobile')
     const { visible, setVisible, bindings } = useModal()
+    const [searchInfo, setSearchInfo] = React.useState('')
+    const [profileMenu, setProfileMenu] = React.useState(false)
+    const [cartMenu, setCartMenu] = React.useState(false)
     return <>
         <style jsx>
             {`
@@ -47,7 +53,10 @@ export function Nav({ ...props }) {
             }
         `}
         </style>
-        <div className='nav-container' >
+        <div className="nav-container" style = {{
+            paddingLeft: '2em',
+            paddingRight: '2em',
+        }}>
             <div className='logo-container' >
                 <Link href='/'><Text>AMORE</Text></Link>
             </div>
@@ -65,9 +74,8 @@ export function Nav({ ...props }) {
             }
         </div>
         <Divider style={{ margin: 0, padding: 0 }} />
-
-
-
+        <Cart open = {cartMenu} onClose = {() => setCartMenu(false)}/>
+        <Profile open={profileMenu} onClose={() => setProfileMenu(false)} isLoggedIn={false}/>
     </>
 }
 

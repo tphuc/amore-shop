@@ -4,7 +4,7 @@ import { Edit3, X } from "@geist-ui/react-icons";
 import CustomInput from "../../components/CustomInput";
 import CustomField from "../../components/CustomField";
 import ErrorMessage from "../../components/ErrorMessage";
-
+import {Nav} from '../../components/Nav'
 const Profile = () => {
   const customerData = {
     // to-do: thay thế giá trị * từ db vào biến này
@@ -212,6 +212,8 @@ const Profile = () => {
   };
 
   return (
+    <>
+    <Nav/>
     <div
       style={{
         backgroundColor: "#f8f8f8",
@@ -222,6 +224,7 @@ const Profile = () => {
         overflow: "hidden"
       }}
     >
+
       {editInformation > 0 ? (
         <div
           style={{
@@ -652,6 +655,7 @@ const Profile = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

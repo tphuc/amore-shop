@@ -109,3 +109,11 @@ export default function Item({data}) {
         </Grid.Container>
     </div>
 }
+
+export const getStaticProps = ({params}) => {
+    return {
+        props: {
+            
+        }
+    }
+}
