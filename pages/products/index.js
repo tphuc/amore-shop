@@ -5,8 +5,8 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import ProductCard from '../../components/ProductCard';
 import { Divider, Grid, Input, Loading, Select, Spacer, Spinner, Text, useMediaQuery, useTheme } from '@geist-ui/react';
-import { useProducts } from '../../frameworks/supabase/api/products';
-import { useCategories } from '../../frameworks/supabase/api/categories';
+import { useProducts } from '../../frameworks/supabase/swr/products';
+import { useCategories } from '../../frameworks/supabase/swr/categories';
 
 
 

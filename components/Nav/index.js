@@ -1,9 +1,9 @@
-import { Button, Divider, useMediaQuery, useModal, useTheme, Modal, ButtonDropdown } from '@geist-ui/react';
+import { Button, Divider, useMediaQuery, useModal, useTheme, Modal, ButtonDropdown, Text } from '@geist-ui/react';
 import React from 'react';
 import Link from 'next/link'
 // import {Dropdown} from 'react-bootstrap'
-import { useCategories } from '../../frameworks/supabase/api/categories';
-import { Menu, ShoppingBag, User } from '@geist-ui/react-icons';
+import { useCategories } from '../../frameworks/supabase/swr/categories';
+import { Menu, ShoppingBag, User, UserX } from '@geist-ui/react-icons';
 export function Nav({ ...props }) {
     const { data: categories } = useCategories()
     //const [anchorMenu, setAnchorMenu] = React.useState(null)
@@ -18,7 +18,9 @@ export function Nav({ ...props }) {
                 box-sizing: border-box;
                 min-height: 60px;
                 width: 100vw;
-                padding: 10px;
+                padding-left: 2em;
+                padding-right: 2em;
+
                 display: flex;
                 flex-direction: row;
                 align-items: center;
@@ -47,28 +49,13 @@ export function Nav({ ...props }) {
         </style>
         <div className='nav-container' >
             <div className='logo-container' >
-                <Link href='/'><p>AMORE</p></Link>
+                <Link href='/'><Text>AMORE</Text></Link>
             </div>
             {!isMobile && categories?.map((item, id) => <Link key={id} href={{ pathname: "/products", query: { category: item.id } }}><a >{item.label}</a></Link>)}
-            <div style={{ marginLeft: "auto", marginRight: "5%", display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                {/* <Dropdown>
-                    <Dropdown.Toggle variant="success" id="dropdown-basic" style = {{
-                        backgroundColor: 'white',
-                        height: '60px',
-                        width: '60px',
-                        border: 'none',
-                        boxShadow: 'none'
-                    }}>
-                        <Button type='abort' iconRight={<User />} auto px={0.6}></Button>
-                    </Dropdown.Toggle>
-
-                    <Dropdown.Menu>
-                        <Dropdown.Item href="/profile">Profile</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-                        <Dropdown.Item href="/logout">Logout</Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown> */}
-
+            <div style={{ marginLeft: "auto", marginRight: "0%", display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                <Link href={'/user-profile'}>
+                    <Button type='abort' iconRight={<User />} auto px={0.6}></Button>
+                </Link>
                 <Button type='abort' iconRight={<ShoppingBag />} auto px={0.6}></Button>
                 {isMobile && <Button onClick={() => setVisible(!visible)} type='abort' iconRight={<Menu />} auto px={0.6} />}
             </div>
