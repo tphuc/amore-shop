@@ -1,11 +1,13 @@
-import { Button, Grid, Radio, Spacer, Text, useToasts } from '@geist-ui/react'
+import { Button, Grid, Input, Radio, Spacer, Text, useToasts } from '@geist-ui/react'
 import { Heart, HeartFill, ShoppingBag } from '@geist-ui/react-icons'
 import React from 'react'
+import CommentItem from '../../components/CommentItem'
 import ImageSlider from '../../components/ImageSlider'
 import { Nav } from '../../components/Nav'
 import { supabase } from '../../frameworks/supabase'
 import { ProductAPI } from '../../frameworks/supabase/api/products'
 import { WishlistAPI } from '../../frameworks/supabase/api/wishlist'
+import { useComments } from '../../frameworks/supabase/swr/comments'
 import { formatNumber } from '../../utils'
 
 const images = [
@@ -70,6 +72,8 @@ export async function getStaticProps(context) {
 export default function ProductItem({data}) {
     const user = supabase.auth.user()
     const [_, toast] = useToasts();
+    const {data: comments } = useComments();
+
 
     const addToWishlist = async () => {
         if(!user){
@@ -97,8 +101,12 @@ export default function ProductItem({data}) {
     return <div>
         <Nav />
         <Grid.Container gap={6} justify="center" height='100vh'>
-            <Grid xs={24} md={24} lg={12} xl={12}>
+            <Grid xs={24} md={24} lg={12} xl={12} direction='column'>
                 <ImageSlider images={data?.images} />
+
+                <Spacer />
+                {comments?.map((item, id) => <CommentItem data={item} key={id}/> )}
+                {user && <Input/>}
             </Grid>
             <Grid xs={24} md={24} lg={10} xl={10} >
                 <div style={{ width: '100%' }}>

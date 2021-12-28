@@ -25,27 +25,27 @@ export default function Products() {
   const { data: products, isLoading } = useProducts(filter)
 
   const addToWishlist = async (data) => {
-    if(!user){
-        toast({
-            text: "Please sign in first",
-            type:"warning"
-        })
+    if (!user) {
+      toast({
+        text: "Please sign in first",
+        type: "warning"
+      })
     }
 
     let res = await WishlistAPI.addItem(data?.id, user?.id)
-    if(!res.error){
-        toast({
-            text: 'Added to wishlist successfully'
-        })
+    if (!res.error) {
+      toast({
+        text: 'Added to wishlist successfully'
+      })
     }
-    else{
-        toast({
-            text: 'Already in wishlist',
-            type:"warning"
-        })
+    else {
+      toast({
+        text: 'Already in wishlist',
+        type: "warning"
+      })
     }
 
-}
+  }
 
   const theme = useTheme()
   const isMobile = useMediaQuery('mobile')
@@ -73,7 +73,7 @@ export default function Products() {
         placeholder='search for products' type="text" />
     </div>
     <Spacer />
-      {isLoading && <Loading spaceRatio={2} scale={2}></Loading>}
+    {isLoading && <Loading spaceRatio={2} scale={2}></Loading>}
     <Grid.Container direction='row' gap={isMobile ? 0 : 2}  >
       {
         products?.map((item, id) => <Grid justify='center' alignItems='center' key={id} xs={24} sm={12} md={6} >

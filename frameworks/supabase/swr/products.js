@@ -15,6 +15,8 @@ const fetcher = async (ENDPOINT, filter) => {
         )
     `)
 
+
+
     for (let k in filter) {
         if (filter[k]) {
             switch (k) {
@@ -27,7 +29,7 @@ const fetcher = async (ENDPOINT, filter) => {
             }
         }
     }
-    console.log(res)
+
     res = await res;
     
     return res.data
@@ -43,3 +45,6 @@ export function useProducts(filter) {
         isError: error
     }
 }
+
+
+

@@ -19,9 +19,9 @@ export default function UserProfile() {
     const theme = useTheme()
     const router = useRouter()
     const authedUser = supabase.auth.user();
-    if(!authedUser){
-        router.push('/sign-in')
-    }
+    // if(!authedUser){
+    //     router.push('/sign-in')
+    // }
  
     // for now user public table is not created yet, so this is not work yet
     const {data: user, mutate } = useUser(authedUser?.id);
@@ -85,7 +85,7 @@ export default function UserProfile() {
 
                 </Tabs.Item>
                 <Tabs.Item label="wishlist" value="3">
-                    {wishlist.map((item, id) => <ProductCard icon={<X/>} key={id} data={item.product}>
+                    {wishlist?.map((item, id) => <ProductCard icon={<X/>} key={id} data={item.product}>
 
                     </ProductCard>)}
                 </Tabs.Item>
