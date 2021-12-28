@@ -3,17 +3,18 @@ import { supabase } from '..'
 
 
 
-const ENDPOINT = 'users'
+const ENDPOINT = 'orders'
 
 
 
 const fetcher = async (ENDPOINT, id) => {
-    let res = await supabase.from(ENDPOINT).select('*').match({id}).single()
+    let res = await supabase.from(ENDPOINT)
+        .select('*')
+        .eq('user', id)
     return res.data
-   
 }
 
-export function useUser(id) {
+export function useUserOrders(id) {
     const { data, error, mutate } = useSWR([ENDPOINT, id], fetcher)
     return {
         mutate,

@@ -1,9 +1,11 @@
-import { Button, Grid, Radio, Spacer, Text } from '@geist-ui/react'
+import { Button, Grid, Radio, Spacer, Text, useToasts } from '@geist-ui/react'
 import { Heart, HeartFill, ShoppingBag } from '@geist-ui/react-icons'
 import React from 'react'
 import ImageSlider from '../../components/ImageSlider'
 import { Nav } from '../../components/Nav'
+import { supabase } from '../../frameworks/supabase'
 import { ProductAPI } from '../../frameworks/supabase/api/products'
+import { WishlistAPI } from '../../frameworks/supabase/api/wishlist'
 import { formatNumber } from '../../utils'
 
 const images = [
@@ -65,7 +67,33 @@ export async function getStaticProps(context) {
     }
   }
 
-export default function Item({data}) {
+export default function ProductItem({data}) {
+    const user = supabase.auth.user()
+    const [_, toast] = useToasts();
+
+    const addToWishlist = async () => {
+        if(!user){
+            toast({
+                text: "Please sign in first",
+                type:"warning"
+            })
+        }
+
+        let res = await WishlistAPI.addItem(data?.id, user?.id)
+        if(!res.error){
+            toast({
+                text: 'Added to wishlist successfully'
+            })
+        }
+        else{
+            toast({
+                text: res.error.message,
+                type:"warning"
+            })
+        }
+
+    }
+
     return <div>
         <Nav />
         <Grid.Container gap={6} justify="center" height='100vh'>
@@ -81,8 +109,7 @@ export default function Item({data}) {
                             
                             auto
                             scale={1} px={0.6}
-                            onClick={() => null}
-                            
+                            onClick={addToWishlist}
                             type='abort' icon={<Heart />}>Add to Wishlist</Button>
                     </div>
                     <Text p>Price: <Text span >{formatNumber(data?.price)}</Text></Text>
@@ -110,10 +137,3 @@ export default function Item({data}) {
     </div>
 }
 
-export const getStaticProps = ({params}) => {
-    return {
-        props: {
-            
-        }
-    }
-}

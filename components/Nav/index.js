@@ -5,8 +5,10 @@ import Link from 'next/link'
 import { useCategories } from '../../frameworks/supabase/swr/categories';
 import { Menu, ShoppingBag, User, UserX } from '@geist-ui/react-icons';
 import '../../styles/Nav.module.css'
-import {Cart} from '../Cart'
+import { Cart } from '../Cart'
 import { Profile } from '../Profile';
+import { supabase } from '../../frameworks/supabase';
+
 export function Nav({ ...props }) {
     const { data: categories } = useCategories()
     //const [anchorMenu, setAnchorMenu] = React.useState(null)
@@ -15,7 +17,9 @@ export function Nav({ ...props }) {
     const { visible, setVisible, bindings } = useModal()
     const [searchInfo, setSearchInfo] = React.useState('')
     const [profileMenu, setProfileMenu] = React.useState(false)
-    const [cartMenu, setCartMenu] = React.useState(false)
+    const [cartMenu, setCartMenu] = React.useState(false);
+    const authedUser = supabase.auth.user();
+
     return <>
         <style jsx>
             {`
@@ -53,7 +57,7 @@ export function Nav({ ...props }) {
             }
         `}
         </style>
-        <div className="nav-container" style = {{
+        <div className="nav-container" style={{
             paddingLeft: '2em',
             paddingRight: '2em',
         }}>
@@ -62,7 +66,7 @@ export function Nav({ ...props }) {
             </div>
             {!isMobile && categories?.map((item, id) => <Link key={id} href={{ pathname: "/products", query: { category: item.id } }}><a >{item.label}</a></Link>)}
             <div style={{ marginLeft: "auto", marginRight: "0%", display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <Link href={'/user-profile'}>
+                <Link href={ authedUser ? '/user-profile' : '/sign-in' }>
                     <Button type='abort' iconRight={<User />} auto px={0.6}></Button>
                 </Link>
                 <Button type='abort' iconRight={<ShoppingBag />} auto px={0.6}></Button>
@@ -74,8 +78,8 @@ export function Nav({ ...props }) {
             }
         </div>
         <Divider style={{ margin: 0, padding: 0 }} />
-        <Cart open = {cartMenu} onClose = {() => setCartMenu(false)}/>
-        <Profile open={profileMenu} onClose={() => setProfileMenu(false)} isLoggedIn={false}/>
+        <Cart open={cartMenu} onClose={() => setCartMenu(false)} />
+        <Profile open={profileMenu} onClose={() => setProfileMenu(false)} isLoggedIn={false} />
     </>
 }
 

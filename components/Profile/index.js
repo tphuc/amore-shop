@@ -9,6 +9,8 @@ export function Profile({open, onClose, isLoggedIn}) {
         name: 'David',
         address: '48 Wall Streat'
     }
+
+
     return (
         <>
             <Drawer visible={open} onClose={onClose} placement="right" style={{
