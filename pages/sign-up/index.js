@@ -1,4 +1,4 @@
-import { Button, Divider, Input, Page, Spacer, Text, useToasts } from '@geist-ui/react';
+import { Button, Divider, Input, Link, Page, Spacer, Text, useToasts } from '@geist-ui/react';
 import React from 'react';
 import { Nav } from '../../components/Nav';
 import { useForm } from 'react-hook-form';
@@ -44,8 +44,9 @@ export default function SignUp(){
         <Spacer/>
         <Page>
           <Page.Header>
-            <h2>AMORE</h2>
-            <p5>Create an account</p5>
+            <h2>Create an account</h2>
+            <br/>
+            <Text span type='secondary'>Already have an account?</Text> <Link href='/sign-in'><Text span type='success'>Sign In</Text></Link>
             <Divider/>
           </Page.Header>
           <Page.Content>
