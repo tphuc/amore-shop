@@ -9,7 +9,7 @@ const images = [
         url: 'https://static-buyma-jp.akamaized.net/imgdata/item/210629/0070803294/368058123/428.jpg'
     }
 ]
-export function Cart({open, onClose}) {
+export function Cart({open, onClose, isCheckout}) {
     const router = useRouter()
     const [data, setData] = React.useState([])
     const [cookie, setCookie] = useCookies(['cart'])
@@ -39,16 +39,19 @@ export function Cart({open, onClose}) {
                 margin: '0% 4%'
             }}>
                 {data.map(item => <CartItem
+                id = {item.id}
                 image = {item.image}
                 name={item.name}
                 size={item.size}
                 quantity={item.quantity}
                 price={item.price}
                 color={item.color}
+                isCheckout = {isCheckout}
                 />)}
             </Drawer.Content>
             <Drawer.Content style={{margin: '0% 4%'}}>
-                <div className={styles.checkoutbutton} onClick={() => {router.push('/checkout')}}>Checkout</div>
+                {!isCheckout? <div className={styles.checkoutbutton} onClick={() => {router.push('/checkout')}}>Checkout</div> : null}
+                
             </Drawer.Content>
         </Drawer>
         </>

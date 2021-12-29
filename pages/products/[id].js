@@ -77,7 +77,6 @@ export default function ProductItem({data}) {
     const [cookie, setCookie] = useCookies(['cart'])
     const addToCart = (data) => {
         let currentCart = cookie.cart
-        console.log(currentCart, data)
         let item = {
             id: data.id,
             name: data.label,
@@ -88,8 +87,6 @@ export default function ProductItem({data}) {
             quantity: 1
         }
         currentCart.push(item)
-        console.log(currentCart)
-        console.log(item)
         setCookie('cart', currentCart, {path: '/'})
     }
     const addToWishlist = async () => {

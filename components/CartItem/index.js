@@ -1,8 +1,23 @@
 import React from 'react'
 import styles from '../../styles/Cart.module.css'
 import { X } from '@geist-ui/react-icons'
+import { useCookies } from 'react-cookie'
+import router from 'next/router'
 
-export function CartItem({image, name, size, quantity, price, color}) {
+export function CartItem({id, image, name, size, quantity, price, color , isCheckout}) {
+    const [cookie, setCookie] = useCookies(['cart'])
+    const removeItem = (id) => {
+        let array = []
+        let cartData = cookie.cart
+        let index = cartData.findIndex(function(o){
+            return o.id == id
+        })
+        if (index != -1) {
+            cartData.splice(index, 1)
+            setCookie('cart', cartData, {path: '/'})
+            router.reload()
+        }
+    }
     return (
         <div className={styles.cartitemcontainer}>
             <img src={image} className={styles.imagerepresent}/>
@@ -20,9 +35,10 @@ export function CartItem({image, name, size, quantity, price, color}) {
                     <div className={styles.cartitemprice}>{price} VND</div>
                 </div>
             </div>
-            <div className={styles.cartitemremove}>
+            {!isCheckout ? <div className={styles.cartitemremove} onClick={() => removeItem(id)}>
                 <X/>
-            </div>
+            </div> : null}
+            
         </div>
     )
 }
