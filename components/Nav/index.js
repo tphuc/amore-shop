@@ -66,10 +66,9 @@ export function Nav({ ...props }) {
             </div>
             {!isMobile && categories?.map((item, id) => <Link key={id} href={{ pathname: "/products", query: { category: item.id } }}><a >{item.label}</a></Link>)}
             <div style={{ marginLeft: "auto", marginRight: "0%", display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                <Link href={ authedUser ? '/user-profile' : '/sign-in' }>
-                    <Button type='abort' iconRight={<User />} auto px={0.6}></Button>
-                </Link>
-                <Button type='abort' iconRight={<ShoppingBag />} auto px={0.6}></Button>
+                
+                <Button type='abort' iconRight={<User />} auto px={0.6} onClick={() => setProfileMenu(true)}></Button>
+                <Button type='abort' iconRight={<ShoppingBag />} onClick={() => setCartMenu(true)} auto px={0.6}></Button>
                 {isMobile && <Button onClick={() => setVisible(!visible)} type='abort' iconRight={<Menu />} auto px={0.6} />}
             </div>
             {visible && isMobile && <div className='nav-modal' style={{ width: "100vw", position: "fixed", bottom: 0, left: 0, boxSizing: "border-box", display: "flex", flexDirection: "column", alignItems: "center", height: "calc(100vh - 60px)", background: theme.palette.background, margin: 0 }}>
@@ -79,7 +78,7 @@ export function Nav({ ...props }) {
         </div>
         <Divider style={{ margin: 0, padding: 0 }} />
         <Cart open={cartMenu} onClose={() => setCartMenu(false)} />
-        <Profile open={profileMenu} onClose={() => setProfileMenu(false)} isLoggedIn={false} />
+        <Profile open={profileMenu} onClose={() => setProfileMenu(false)} />
     </>
 }
 

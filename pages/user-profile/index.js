@@ -12,8 +12,6 @@ import { useUserWishlist } from '../../frameworks/supabase/swr/user-wishlist';
 
 
 
-
-
 export default function UserProfile() {
 
     const theme = useTheme()
