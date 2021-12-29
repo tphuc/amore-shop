@@ -47,8 +47,8 @@ export function Profile({open, onClose, isLoggedIn}) {
                                 <div className={styles.profilebutton}>Help</div>
                                 <div className={styles.profilebutton}>Logout</div>
                             </div> : <div>
-                                <div className={styles.profilebutton}>Sign In</div>
-                                <div className={styles.profilebutton}>Sign Up</div>
+                                <div className={styles.profilebutton} onClick={() => router.push('/login')}>Sign In</div>
+                                <div className={styles.profilebutton} onClick={() => router.push('/signup')}>Sign Up</div>
                                 </div>}
                             
                         </div>

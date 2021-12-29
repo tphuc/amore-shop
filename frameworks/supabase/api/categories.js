@@ -8,10 +8,8 @@ const ENDPOINT = 'categories'
 
 
 const fetcher = async (ENDPOINT) => {
-
     let res = await supabase.from(ENDPOINT).select('*')
     return res.data
-   
 }
 
 export function useCategories() {
