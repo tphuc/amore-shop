@@ -1,11 +1,14 @@
-import { Button, Divider, useMediaQuery, useModal, useTheme, Modal, Input } from '@geist-ui/react';
+import { Button, Divider, useMediaQuery, useModal, useTheme, Modal, ButtonDropdown, Text } from '@geist-ui/react';
 import React from 'react';
 import Link from 'next/link'
-import { useCategories } from '../../frameworks/supabase/api/categories';
-import { Menu, ShoppingBag, User, Search } from '@geist-ui/react-icons';
+// import {Dropdown} from 'react-bootstrap'
+import { useCategories } from '../../frameworks/supabase/swr/categories';
+import { Menu, ShoppingBag, User, UserX } from '@geist-ui/react-icons';
 import '../../styles/Nav.module.css'
-import {Cart} from '../Cart'
+import { Cart } from '../Cart'
 import { Profile } from '../Profile';
+import { supabase } from '../../frameworks/supabase';
+
 export function Nav({ ...props }) {
     const { data: categories } = useCategories()
     //const [anchorMenu, setAnchorMenu] = React.useState(null)
@@ -14,7 +17,9 @@ export function Nav({ ...props }) {
     const { visible, setVisible, bindings } = useModal()
     const [searchInfo, setSearchInfo] = React.useState('')
     const [profileMenu, setProfileMenu] = React.useState(false)
-    const [cartMenu, setCartMenu] = React.useState(false)
+    const [cartMenu, setCartMenu] = React.useState(false);
+    const authedUser = supabase.auth.user();
+
     return <>
         <style jsx>
             {`
@@ -23,7 +28,9 @@ export function Nav({ ...props }) {
                 box-sizing: border-box;
                 min-height: 60px;
                 width: 100vw;
-                padding: 10px;
+                padding-left: 2em;
+                padding-right: 2em;
+
                 display: flex;
                 flex-direction: row;
                 align-items: center;
@@ -50,31 +57,19 @@ export function Nav({ ...props }) {
             }
         `}
         </style>
-        <div className="nav-container" style = {{
-            marginLeft: '2%',
+        <div className="nav-container" style={{
+            paddingLeft: '2em',
+            paddingRight: '2em',
         }}>
             <div className='logo-container' >
-                <Link href='/'><p style = {{
-                    fontWeight: 'bold',
-                    fontSize: '20px'
-                }}>AMORE</p></Link>
+                <Link href='/'><Text>AMORE</Text></Link>
             </div>
-            {!isMobile && categories?.map((item, id) =>
-            <div style = {{
-                padding: '0% 1%'
-            }}> <Link key={id} href={{ pathname:"/products", query: { category: item.id }  }}><a >{item.label}</a></Link>
-            </div>)}
-            <div style={{ marginLeft: "auto", marginRight: "5%", display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-                <Input placeholder = "product" style = {{
-                    width: '400px',
-                    borderRadius: '50px'
-                }} icon = {<Search/>} onChange = {(e) => {
-                    setSearchInfo(e.target.value)
-                }}>
-                </Input>
-                
-                <Button type='abort' iconRight={<User />} onClick={() => setProfileMenu(!profileMenu)} auto px={0.6}></Button>
-                <Button type='abort' iconRight={<ShoppingBag />} onClick={() => setCartMenu(true)} auto px={0.6}></Button>
+            {!isMobile && categories?.map((item, id) => <Link key={id} href={{ pathname: "/products", query: { category: item.id } }}><a >{item.label}</a></Link>)}
+            <div style={{ marginLeft: "auto", marginRight: "0%", display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                <Link href={ authedUser ? '/user-profile' : '/sign-in' }>
+                    <Button type='abort' iconRight={<User />} auto px={0.6}></Button>
+                </Link>
+                <Button type='abort' iconRight={<ShoppingBag />} auto px={0.6}></Button>
                 {isMobile && <Button onClick={() => setVisible(!visible)} type='abort' iconRight={<Menu />} auto px={0.6} />}
             </div>
             {visible && isMobile && <div className='nav-modal' style={{ width: "100vw", position: "fixed", bottom: 0, left: 0, boxSizing: "border-box", display: "flex", flexDirection: "column", alignItems: "center", height: "calc(100vh - 60px)", background: theme.palette.background, margin: 0 }}>
@@ -83,8 +78,8 @@ export function Nav({ ...props }) {
             }
         </div>
         <Divider style={{ margin: 0, padding: 0 }} />
-        <Cart open = {cartMenu} onClose = {() => setCartMenu(false)}/>
-        <Profile open={profileMenu} onClose={() => setProfileMenu(false)} isLoggedIn={false}/>
+        <Cart open={cartMenu} onClose={() => setCartMenu(false)} />
+        <Profile open={profileMenu} onClose={() => setProfileMenu(false)} isLoggedIn={false} />
     </>
 }
 

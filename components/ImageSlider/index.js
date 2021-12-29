@@ -43,7 +43,7 @@ export default function ImageSlider({
         }
     }
 
-    return <div style={{ position: "relative" }}>
+    return <div style={{ position: "relative", width:"100%" }}>
         <style jsx>{`
         .carousel {
             overflow-x: auto;

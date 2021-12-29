@@ -368,6 +368,7 @@ const CheckOut = () => {
         <Drawer.Content>
           {productData.map((item, index) => (
             <div
+              key={index}
               style={{
                 border: "1px solid #eaeaea",
                 display: "flex",
@@ -829,6 +830,7 @@ const CheckOut = () => {
             <Radio.Group value={tempShippingIdx} onChange={onChangeShipping}>
               {shippingData.map((item, index) => (
                 <div
+                  key={index}
                   style={
                     tempShippingIdx === index
                       ? {
