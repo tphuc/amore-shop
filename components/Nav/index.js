@@ -8,6 +8,8 @@ import '../../styles/Nav.module.css'
 import { Cart } from '../Cart'
 import { Profile } from '../Profile';
 import { supabase } from '../../frameworks/supabase';
+import {useCookies} from 'react-cookie'
+import {Cookies} from 'react-cookie'
 
 export function Nav({ ...props }) {
     const { data: categories } = useCategories()
@@ -19,7 +21,6 @@ export function Nav({ ...props }) {
     const [profileMenu, setProfileMenu] = React.useState(false)
     const [cartMenu, setCartMenu] = React.useState(false);
     const authedUser = supabase.auth.user();
-
     return <>
         <style jsx>
             {`

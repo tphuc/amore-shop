@@ -9,6 +9,7 @@ import { ProductAPI } from '../../frameworks/supabase/api/products'
 import { WishlistAPI } from '../../frameworks/supabase/api/wishlist'
 import { useComments } from '../../frameworks/supabase/swr/comments'
 import { formatNumber } from '../../utils'
+import { useCookies } from 'react-cookie'
 
 const images = [
     {
@@ -73,8 +74,24 @@ export default function ProductItem({data}) {
     const user = supabase.auth.user()
     const [_, toast] = useToasts();
     const {data: comments } = useComments();
-
-
+    const [cookie, setCookie] = useCookies(['cart'])
+    const addToCart = (data) => {
+        let currentCart = cookie.cart
+        console.log(currentCart, data)
+        let item = {
+            id: data.id,
+            name: data.label,
+            image: data.images[0].url,
+            price: data.price,
+            size: 'S',
+            color: 'white',
+            quantity: 1
+        }
+        currentCart.push(item)
+        console.log(currentCart)
+        console.log(item)
+        setCookie('cart', currentCart, {path: '/'})
+    }
     const addToWishlist = async () => {
         if(!user){
             toast({
@@ -131,7 +148,7 @@ export default function ProductItem({data}) {
                     </Radio.Group>
                     <Spacer h={0.5} />
                     <Button
-                        onClick={() => null}
+                        onClick={() => addToCart(data)}
                         scale={1.5} type='secondary-light' iconRight={<ShoppingBag />} width='100%'>Add to cart</Button>
                     <Spacer h={0.5} />
                     <div className='content-description' style={{ width: "100%", whiteSpace: 'break-spaces' }} dangerouslySetInnerHTML={{ __html: data?.description }}></div>

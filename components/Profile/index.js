@@ -55,7 +55,7 @@ export function Profile({open, onClose}) {
                                 <div className={styles.profilebutton}>Help</div>
                                 <div className={styles.profilebutton} onClick={() => {
                                     supabase.auth.signOut()
-                                   router.push('/')}}>Logout</div>
+                                    router.reload()}}>Logout</div>
                             </div> : <div>
                                 <div className={styles.profilebutton} onClick={() => router.push('/sign-in')}>Sign In</div>
                                 <div className={styles.profilebutton} onClick={() => router.push('/sign-up')}>Sign Up</div>

@@ -3,6 +3,7 @@ import styles from '../../styles/Cart.module.css'
 import { Drawer } from '@geist-ui/react'
 import { CartItem } from '../CartItem'
 import { useRouter } from 'next/router'
+import {useCookies} from 'react-cookie'
 const images = [
     {
         url: 'https://static-buyma-jp.akamaized.net/imgdata/item/210629/0070803294/368058123/428.jpg'
@@ -10,6 +11,11 @@ const images = [
 ]
 export function Cart({open, onClose}) {
     const router = useRouter()
+    const [data, setData] = React.useState([])
+    const [cookie, setCookie] = useCookies(['cart'])
+    React.useEffect(() => {
+        setData(cookie.cart)
+    })
     return (
         <>
         <Drawer visible={open} onClose={onClose} placement="right" style={{
@@ -32,7 +38,8 @@ export function Cart({open, onClose}) {
             <Drawer.Content style={{
                 margin: '0% 4%'
             }}>
-                {tempData.map(item => <CartItem image = 'https://static-buyma-jp.akamaized.net/imgdata/item/210629/0070803294/368058123/428.jpg'
+                {data.map(item => <CartItem
+                image = {item.image}
                 name={item.name}
                 size={item.size}
                 quantity={item.quantity}

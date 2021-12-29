@@ -5,8 +5,6 @@ import Link from 'next/link';
 import { Heart, XCircle } from '@geist-ui/react-icons';
 
 
-
-
 export default function ProductCard({
   showPrice = true,
 
@@ -17,7 +15,6 @@ export default function ProductCard({
   icon = <Heart/>,
   ...props
 }) {
-
   const { palette } = useTheme()
   return <div style={{ border: "none", position: "relative", cursor: "pointer", maxWidth: width }} width="100%" >
     <div style={{ position: "absolute", zIndex: 2, top: 5, right: 0 }}>

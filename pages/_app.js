@@ -1,7 +1,7 @@
 
 import { GeistProvider, CssBaseline } from '@geist-ui/react'
 import { Themes } from '@geist-ui/react';
-
+import { CookiesProvider } from 'react-cookie';
 const myTheme = Themes.createFromLight({
   "type": "Custom",
   "layout": {
@@ -29,10 +29,12 @@ const myTheme = Themes.createFromLight({
 
 function MyApp({ Component, pageProps }) {
 
-  return <GeistProvider themes={[myTheme]} themeType='Custom'>
-    <CssBaseline />
-    <Component {...pageProps} />
-  </GeistProvider>
+  return <CookiesProvider>
+    <GeistProvider themes={[myTheme]} themeType='Custom'>
+      <CssBaseline />
+      <Component {...pageProps} />
+    </GeistProvider>
+  </CookiesProvider>
 
 }
 
