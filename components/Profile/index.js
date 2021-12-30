@@ -15,7 +15,7 @@ export function Profile({open, onClose}) {
         if (authUser) {
             setIsLoggedIn(true)
         }
-    })
+    }, [authUser])
 
     return (
         <>

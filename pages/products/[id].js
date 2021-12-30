@@ -1,4 +1,4 @@
-import { Button, Grid, Input, Radio, Spacer, Text, useToasts } from '@geist-ui/react'
+import { Button, Divider, Grid, Input, Radio, Spacer, Text, useToasts } from '@geist-ui/react'
 import { Heart, HeartFill, ShoppingBag } from '@geist-ui/react-icons'
 import React from 'react'
 import CommentItem from '../../components/CommentItem'
@@ -10,6 +10,8 @@ import { WishlistAPI } from '../../frameworks/supabase/api/wishlist'
 import { useComments } from '../../frameworks/supabase/swr/comments'
 import { formatNumber } from '../../utils'
 import { useCookies } from 'react-cookie'
+import { useForm } from 'react-hook-form';
+import { CommentsAPI } from '../../frameworks/supabase/api/comment'
 
 const images = [
     {
@@ -60,23 +62,25 @@ export async function getStaticProps(context) {
     const res = await ProductAPI.getById(id)
     const data = res
     if (!data) {
-      return {
-        notFound: true,
-      }
+        return {
+            notFound: true,
+        }
     }
 
     return {
-      props: { data }, // will be passed to the page component as props
+        props: { data }, // will be passed to the page component as props
     }
-  }
+}
 
-export default function ProductItem({data}) {
+export default function ProductItem({ data }) {
     const user = supabase.auth.user()
     const [_, toast] = useToasts();
-    const {data: comments } = useComments();
+    const { data: comments, mutate: commentsMutate } = useComments();
     const [cookie, setCookie] = useCookies(['cart'])
+    const [comment, setComment] = React.useState('')
+
     const addToCart = (data) => {
-        let currentCart = cookie.cart
+        let currentCart = cookie.cart || []
         let item = {
             id: data.id,
             name: data.label,
@@ -86,30 +90,45 @@ export default function ProductItem({data}) {
             color: 'white',
             quantity: 1
         }
-        currentCart.push(item)
-        setCookie('cart', currentCart, {path: '/'})
+        currentCart = [...currentCart, item]
+        setCookie('cart', currentCart, { path: '/' })
     }
+
     const addToWishlist = async () => {
-        if(!user){
+        if (!user) {
             toast({
                 text: "Please sign in first",
-                type:"warning"
+                type: "warning"
             })
         }
 
         let res = await WishlistAPI.addItem(data?.id, user?.id)
-        if(!res.error){
+        if (!res.error) {
             toast({
                 text: 'Added to wishlist successfully'
             })
         }
-        else{
+        else {
             toast({
                 text: res.error.message,
-                type:"warning"
+                type: "warning"
             })
         }
 
+    }
+
+    const onSubmitComment = async () => {
+        let res = await CommentsAPI.addItem(user?.id, data?.id, comment)
+        if(!res.error){
+            setComment('')
+            commentsMutate()
+        }
+        else{
+            toast({
+                text: res.error.message,
+                type: "warning"
+            })
+        }
     }
 
     return <div>
@@ -118,17 +137,22 @@ export default function ProductItem({data}) {
             <Grid xs={24} md={24} lg={12} xl={12} direction='column'>
                 <ImageSlider images={data?.images} />
 
-                <Spacer />
-                {comments?.map((item, id) => <CommentItem data={item} key={id}/> )}
-                {user && <Input/>}
+                {comments?.length == 0 && <Text>Feedback is empty</Text>}
+                {comments?.map((item, id) => <CommentItem data={item} key={id} />)}
+                <Spacer h={6} />
+                <Divider />
+                {user && <div>
+                    <Input placeholder='add your feedback...' value={comment} onChange={(e) => setComment(e.target.value)} width={'100%'} />
+                    <Button disabled={!comment} mt={'1em'} onClick={onSubmitComment} type='secondary-light'>Submit</Button>
+                </div>}
             </Grid>
             <Grid xs={24} md={24} lg={10} xl={10} >
                 <div style={{ width: '100%' }}>
                     <Spacer h={0.5} />
-                    <div style={{display:"flex", flexDirection:"row", justifyContent:"space-between", alignItems:"center"}}>
+                    <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                         <Text h2>{data.label}</Text>
                         <Button
-                            
+
                             auto
                             scale={1} px={0.6}
                             onClick={addToWishlist}
@@ -149,7 +173,7 @@ export default function ProductItem({data}) {
                         scale={1.5} type='secondary-light' iconRight={<ShoppingBag />} width='100%'>Add to cart</Button>
                     <Spacer h={0.5} />
                     <div className='content-description' style={{ width: "100%", whiteSpace: 'break-spaces' }} dangerouslySetInnerHTML={{ __html: data?.description }}></div>
-                   
+
 
                 </div>
             </Grid>

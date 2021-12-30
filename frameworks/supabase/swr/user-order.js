@@ -9,7 +9,7 @@ const ENDPOINT = 'orders'
 
 const fetcher = async (ENDPOINT, id) => {
     let res = await supabase.from(ENDPOINT)
-        .select('*')
+        .select(`*`)
         .eq('user', id)
     return res.data
 }

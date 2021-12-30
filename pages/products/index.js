@@ -17,8 +17,9 @@ export default function Products() {
   const { data: cateogries } = useCategories()
   const [_, toast] = useToasts();
   const user = supabase.auth.user()
+  console.log(20, category)
   const [filter, setFilter] = useState({
-    category: '',
+    category: category,
     label: ''
   })
 
@@ -57,7 +58,7 @@ export default function Products() {
 
     <Nav />
     <div style={{ background: "#fff" }} >
-      <Select onChange={(val) => {
+      <Select value={filter.category} onChange={(val) => {
         setFilter({ ...filter, category: val })
       }} scale={1.2} height={'60px'} style={{ borderWidth: 0, }} placeholder="Select category" >
         {cateogries?.map((item, id) => <Select.Option key={id} value={`${item.id}`}>{item.label}</Select.Option>)}
@@ -74,6 +75,7 @@ export default function Products() {
     </div>
     <Spacer />
     {isLoading && <Loading spaceRatio={2} scale={2}></Loading>}
+    {products?.length == 0 && <Text type='secondary' ml='2em'>Products are not found</Text>}
     <Grid.Container direction='row' gap={isMobile ? 0 : 2}  >
       {
         products?.map((item, id) => <Grid justify='center' alignItems='center' key={id} xs={24} sm={12} md={6} >
