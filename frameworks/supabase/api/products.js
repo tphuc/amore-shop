@@ -1,41 +1,12 @@
-import useSWR from 'swr'
+import { supabase } from "..";
 
-
-
-const ENDPOINT = 'products'
-
-
-
-const fetcher = async (ENDPOINT) => {
-
-    // for now use static data to display
-    return ([
-        {
-            label: 'Short Monogram Wool Elegant Style Peacoats 1',
-            id: 1
-        },
-        {
-            label: 'Short Monogram Wool Elegant Style Peacoats 2',
-            id: 2
-        },
-        {
-            label: 'Short Monogram Wool Elegant Style Peacoats 3',
-            id: 3
-        },
-        {
-            label: 'Short Monogram Wool Elegant Style Peacoats 4',
-            id: 3
-        }
-    ])
-   
-}
-
-export function useProducts() {
-    const { data, error, mutate } = useSWR(ENDPOINT, fetcher)
-    return {
-        mutate,
-        data: data,
-        isLoading: !error && !data,
-        isError: error
-    }
+export const ProductAPI = {
+    getAll: async () => {
+        let res = await supabase.from('products').select('*')
+        return res.data
+    },
+    getById: async (id) => {
+        let res = await supabase.from('products').select('*').match({id}).single()
+        return res.data
+    },
 }

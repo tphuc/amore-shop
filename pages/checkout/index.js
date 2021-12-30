@@ -1,24 +1,34 @@
 import React from "react";
-import { Button, Drawer, Input, Radio, Spacer, Text } from "@geist-ui/react";
+import { Button, Drawer, Input, Radio, Spacer, Text, useToasts } from "@geist-ui/react";
 import { Edit3, X, ArrowUp } from "@geist-ui/react-icons";
 import CustomInput from "../../components/CustomInput";
 import CustomField from "../../components/CustomField";
 import ErrorMessage from "../../components/ErrorMessage";
-
+import { Nav } from "../../components/Nav";
+import { supabase } from "../../frameworks/supabase";
+import { useUser } from "../../frameworks/supabase/swr/user";
+import { Cart } from "../../components/Cart";
+import { useCookies } from "react-cookie";
+import { CheckoutAPI } from '../../frameworks/supabase/api/checkout'
 const CheckOut = () => {
-  const customerData = {
+  const authUser = supabase.auth.user()
+  const {data: user, mutate} = useUser(authUser?.id)
+  const [customerData, setCustomerData] = React.useState({
+    id: "",
     //to-do: thay thế giá trị * get data from database
-    firstName: "Thai Quynh",
-    lastName: "Mai",
-    email: "quynhmaithai@gmail.com",
-    phone: "09390329323",
-    streetAddress: "43/42, Ward 10, District 6",
+    firstName: "",
+    email: "",
+    phone: "",
+    streetAddress: "",
     streetAddressLine2: null,
     city: "Ho Chi Minh",
     stateProvinceRegion: "Ho Chi Minh",
     country: "Vietnam",
     zip: "70000"
-  };
+  })
+
+  
+  
   const shippingData = [
     //to-do: thay thế giá trị * get data from database
     {
@@ -79,8 +89,11 @@ const CheckOut = () => {
   const [current, setCurrent] = React.useState(0);
   const [currentError, setCurrentError] = React.useState(false);
   const [havingData, setHavingData] = React.useState([false, false, false]);
-  const [drawerShown, setDrawerShown] = React.useState(false);
   const [showBackToTop, setShowBackToTop] = React.useState(false);
+  const [cartMenu, setCartMenu] = React.useState(false)
+  const [cookie, setCookie] = useCookies(['cart'])
+  const [cartData, setCartData] = React.useState([])
+  const [_, toast] = useToasts()
   React.useEffect(() => {
     window.addEventListener("scroll", () => {
       if (window.pageYOffset > 10) {
@@ -89,16 +102,81 @@ const CheckOut = () => {
         setShowBackToTop(false);
       }
     });
-  }, []);
+    console.log(user)
+    let customer = {
+      id: user? user.id: '',
+      firstName: user? user.full_name : '',
+      email: user? user.email? user.email: '' : '',
+      phone: user? user.phone : '',
+      streetAddress: user? user.address : '',
+      streetAddressLine2: null,
+      city: "Ho Chi Minh",
+      stateProvinceRegion: "Ho Chi Minh",
+      country: "Vietnam",
+      zip: "70000"
+    }
+    setCustomerData(customer)
+    setTempInformation({
+      firstName: user? user.full_name : '',
+      lastName: '',
+      email: user? user.email? user.email : '' : '',
+      phone: user? user.phone : '',
+    })
+    setBillingAddress({
+      streetAddress: user? user.address: '',
+      streetAddressLine2: '',
+      city: customerData.city,
+      stateProvinceRegion: customerData.stateProvinceRegion,
+      country: customerData.country,
+      zip: customerData.zip
+    })
+    let subTotal = SubTotal()
+    setBillSubTotal(subTotal)
+    setCartData(cookie.cart)
+  }, [user]);
+  const SubTotal = () => {
+    let price = 0
+    let cartData = cookie.cart
+    for (let i = 0 ; i < cartData.length ; i++){
+      price += parseInt(cartData[i].price) 
+    }
+    return price
+  }
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: "smooth"
     });
   };
+  const Purchase = async () => {
+    if ( !supabase.auth.user) {
+      toast({
+        text: "Checkout successfully",
+        type:"success"
+      })
+      setCookie('cart', [], {path: '/'})
+    }
+    else {
+      let res = await CheckoutAPI.addItem(customerData.id, billingAddress.streetAddress, customerData.firstName, "COD", customerData.phone, billSubTotal - billDiscount, cartData, false)
+      if(!res.error){
+        toast({
+            text: 'Purchase Successfully',
+            type: 'success'
+        })
+        setCookie('cart', [], {path: '/'})
+      }
+      else{
+          toast({
+              text: res.error.message,
+              type:"warning"
+          })
+      }
+      setCookie('cart', [], {path: '/'})
+    }
+  }
   // ------------------------ state - data ------------------------ //
   const [tempInformation, setTempInformation] = React.useState({
-    firstName: customerData.firstName,
+    firstName: customerData.full_name,
     lastName: customerData.lastName,
     email: customerData.email,
     phone: customerData.phone
@@ -122,7 +200,7 @@ const CheckOut = () => {
   const [isApplied, setIsApplied] = React.useState(0);
   const [billDiscount, setBillDiscount] = React.useState(0);
 
-  const [billSubTotal] = React.useState(() => {
+  const [billSubTotal, setBillSubTotal] = React.useState(() => {
     let res = 0;
     for (let i = 0; i < productData.length; i++)
       res += productData[i].price * productData[i].quantity;
@@ -254,7 +332,6 @@ const CheckOut = () => {
   const onClickSaveInformation = () => {
     if (
       isNotNullText(tempInformation.firstName) &&
-      isNotNullText(tempInformation.lastName) &&
       isNotNullPhoneNumber(tempInformation.phone) &&
       isNotNullEmail(tempInformation.email)
     ) {
@@ -320,6 +397,8 @@ const CheckOut = () => {
   };
 
   return (
+    <>
+    <Nav/>
     <div
       style={{
         backgroundColor: "#f8f8f8",
@@ -352,88 +431,7 @@ const CheckOut = () => {
         </div>
       )}
 
-      <Drawer
-        visible={drawerShown}
-        onClose={() => setDrawerShown(false)}
-        placement="right"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "start",
-          alignItems: "center",
-          padding: "15px 30px",
-          borderRadius: 0
-        }}
-      >
-        <Drawer.Content>
-          {productData.map((item, index) => (
-            <div
-              style={{
-                border: "1px solid #eaeaea",
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "start",
-                padding: "15px",
-                marginBottom: "15px"
-              }}
-            >
-              <div
-                style={{
-                  objectFit: "cover",
-                  width: "130px",
-                  height: "180px",
-                  backgroundColor: "pink",
-                  marginRight: "15px"
-                }}
-              >
-                {item.image}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  width: "250px"
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 500,
-                    cursor: "default",
-                    textTransform: "uppercase"
-                  }}
-                >
-                  {item.name}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 500,
-                    color: "gray",
-                    cursor: "default"
-                  }}
-                >
-                  {item.color}
-                  {" · "}
-                  {item.size}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 12,
-                    fontWeight: 500,
-                    cursor: "default"
-                  }}
-                >
-                  ${item.price.toFixed(2)}
-                  {" × "}
-                  {item.quantity}
-                </Text>
-              </div>
-            </div>
-          ))}
-        </Drawer.Content>
-      </Drawer>
+      <Cart open={cartMenu} onClose={() => setCartMenu(false)} isCheckout={true}/>
       <Spacer w={15} />
       <div
         className="checkout-left"
@@ -491,23 +489,15 @@ const CheckOut = () => {
             >
               <CustomInput
                 label="First name"
-                initialValue={information.firstName}
+                initialValue={tempInformation.firstName}
                 required
                 onChange={(e) => {
                   onChangeFirstName(e);
                 }}
               />
               <CustomInput
-                label="Last name"
-                initialValue={information.lastName}
-                required
-                onChange={(e) => {
-                  onChangeLastName(e);
-                }}
-              />
-              <CustomInput
                 label="Email"
-                initialValue={information.email}
+                initialValue={tempInformation.email? customerData.email : ''}
                 required
                 onChange={(e) => {
                   onChangeEmail(e);
@@ -515,7 +505,7 @@ const CheckOut = () => {
               />
               <CustomInput
                 label="Phone number"
-                initialValue={information.phone}
+                initialValue={customerData.phone? customerData.phone : ''}
                 required
                 onChange={(e) => {
                   onChangePhone(e);
@@ -829,6 +819,7 @@ const CheckOut = () => {
             <Radio.Group value={tempShippingIdx} onChange={onChangeShipping}>
               {shippingData.map((item, index) => (
                 <div
+                  key={index}
                   style={
                     tempShippingIdx === index
                       ? {
@@ -1121,7 +1112,7 @@ const CheckOut = () => {
                   cursor: "default"
                 }}
               >
-                ${billSubTotal.toFixed(2)}
+                {billSubTotal.toFixed(2)} VND
               </Text>
             </div>
             <div
@@ -1151,7 +1142,7 @@ const CheckOut = () => {
                   color: "red"
                 }}
               >
-                - ${billDiscount.toFixed(2)}
+                - {billDiscount.toFixed(2)} VND
               </Text>
             </div>
             <div
@@ -1218,7 +1209,7 @@ const CheckOut = () => {
                   cursor: "default"
                 }}
               >
-                {havingData[2] ? "$" + getTotal().toFixed(2) : "TBD"}
+                {billSubTotal - billDiscount}
               </Text>
             </div>
             <div
@@ -1242,7 +1233,7 @@ const CheckOut = () => {
                   fontWeight: 500,
                   textDecoration: "underline"
                 }}
-                onClick={() => setDrawerShown(true)}
+                onClick={() => setCartMenu(true)}
               >
                 View your cart
               </Button>
@@ -1268,7 +1259,7 @@ const CheckOut = () => {
                   color: "white",
                   border: 0
                 }}
-                onClick={() => {}}
+                onClick={() => Purchase()}
               >
                 Complete your purchase
               </Button>
@@ -1278,6 +1269,7 @@ const CheckOut = () => {
       </div>
       <Spacer w={15} />
     </div>
+    </>
   );
 };
 

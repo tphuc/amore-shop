@@ -30,10 +30,13 @@ export default function Item() {
     </div>
 }
 
-export const getStaticPath = ({params}) => {
+export const getStaticProps = ({params}) => {
     return {
         props: {
             
         }
     }
+}
+export const getStaticPaths = ({id}) => {
+    return { paths: [], fallback: 'blocking' }
 }

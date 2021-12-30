@@ -3,12 +3,20 @@ import { Drawer } from '@geist-ui/react'
 import styles from '../../styles/Profile.module.css'
 import { User } from '@geist-ui/react-icons'
 import router from 'next/router'
+import { supabase } from '../../frameworks/supabase'
+import { useUser } from '../../frameworks/supabase/swr/user'
 
 export function Profile({open, onClose}) {
-    let user = {
-        name: 'David',
-        address: '48 Wall Streat'
-    }
+    const [isLoggedIn, setIsLoggedIn] = React.useState(false)
+    const authUser = supabase.auth.user()
+
+    const {data: user, mutate} = useUser(authUser?.id)
+    React.useEffect(() => {
+        if (authUser) {
+            setIsLoggedIn(true)
+        }
+    }, [authUser])
+
     return (
         <>
             <Drawer visible={open} onClose={onClose} placement="right" style={{
@@ -37,13 +45,22 @@ export function Profile({open, onClose}) {
                             <div className={styles.profileusericon}>
                                 <User size={60}/>
                             </div>
-                            <p className={styles.profileusername}>{user.name}</p>
+                            {isLoggedIn ? <p className={styles.profileusername}>{user?.full_name}</p> : <div></div>}
+                            
                         </div>
                         <div className={styles.profilecontent}>
-                            <div className={styles.profilebutton} onClick={() => router.push('/profile')}>Profile</div>
-                            <div className={styles.profilebutton}>Setting</div>
-                            <div className={styles.profilebutton}>Help</div>
-                            <div className={styles.profilebutton}>Logout</div>
+                            {isLoggedIn ? <div>
+                                <div className={styles.profilebutton} onClick={() => router.push('/user-profile')}>Profile</div>
+                                <div className={styles.profilebutton}>Setting</div>
+                                <div className={styles.profilebutton}>Help</div>
+                                <div className={styles.profilebutton} onClick={() => {
+                                    supabase.auth.signOut()
+                                    router.reload()}}>Logout</div>
+                            </div> : <div>
+                                <div className={styles.profilebutton} onClick={() => router.push('/sign-in')}>Sign In</div>
+                                <div className={styles.profilebutton} onClick={() => router.push('/sign-up')}>Sign Up</div>
+                                </div>}
+                            
                         </div>
                     </div>
                 </Drawer.Content>
