@@ -10,9 +10,10 @@ import { useUser } from "../../frameworks/supabase/swr/user";
 import { Cart } from "../../components/Cart";
 import { useCookies } from "react-cookie";
 import { CheckoutAPI } from '../../frameworks/supabase/api/checkout'
+import emailjs from 'emailjs-com'
 const CheckOut = () => {
   const authUser = supabase.auth.user()
-  const {data: user, mutate} = useUser(authUser?.id)
+  const { data: user, mutate } = useUser(authUser?.id)
   const [customerData, setCustomerData] = React.useState({
     id: "",
     //to-do: thay thế giá trị * get data from database
@@ -27,8 +28,9 @@ const CheckOut = () => {
     zip: "70000"
   })
 
-  
-  
+
+
+
   const shippingData = [
     //to-do: thay thế giá trị * get data from database
     {
@@ -104,11 +106,11 @@ const CheckOut = () => {
     });
     console.log(user)
     let customer = {
-      id: user? user.id: '',
-      firstName: user? user.full_name : '',
-      email: user? user.email? user.email: '' : '',
-      phone: user? user.phone : '',
-      streetAddress: user? user.address : '',
+      id: user ? user.id : '',
+      firstName: user ? user.full_name : '',
+      email: user ? user.email ? user.email : '' : '',
+      phone: user ? user.phone : '',
+      streetAddress: user ? user.address : '',
       streetAddressLine2: null,
       city: "Ho Chi Minh",
       stateProvinceRegion: "Ho Chi Minh",
@@ -117,13 +119,13 @@ const CheckOut = () => {
     }
     setCustomerData(customer)
     setTempInformation({
-      firstName: user? user.full_name : '',
+      firstName: user ? user.full_name : '',
       lastName: '',
-      email: user? user.email? user.email : '' : '',
-      phone: user? user.phone : '',
+      email: user ? user.email ? user.email : '' : '',
+      phone: user ? user.phone : '',
     })
     setBillingAddress({
-      streetAddress: user? user.address: '',
+      streetAddress: user ? user.address : '',
       streetAddressLine2: '',
       city: customerData.city,
       stateProvinceRegion: customerData.stateProvinceRegion,
@@ -137,8 +139,8 @@ const CheckOut = () => {
   const SubTotal = () => {
     let price = 0
     let cartData = cookie.cart
-    for (let i = 0 ; i < cartData.length ; i++){
-      price += parseInt(cartData[i].price) 
+    for (let i = 0; i < cartData.length; i++) {
+      price += parseInt(cartData[i].price)
     }
     return price
   }
@@ -149,29 +151,44 @@ const CheckOut = () => {
     });
   };
   const Purchase = async () => {
-    if ( !supabase.auth.user) {
+    if (!supabase.auth.user) {
       toast({
         text: "Checkout successfully",
-        type:"success"
+        type: "success"
       })
-      setCookie('cart', [], {path: '/'})
+      setCookie('cart', [], { path: '/' })
     }
     else {
       let res = await CheckoutAPI.addItem(customerData.id, billingAddress.streetAddress, customerData.firstName, "COD", customerData.phone, billSubTotal - billDiscount, cartData, false)
-      if(!res.error){
+      if (!res.error) {
         toast({
-            text: 'Purchase Successfully',
-            type: 'success'
+          text: 'Purchase Successfully',
+          type: 'success'
         })
-        setCookie('cart', [], {path: '/'})
+        emailjs.send('order_service', 'order_template', {
+          name: `${customerData.firstName} ${customerData.phone}`,
+          message: `
+              ${cartData.map(item => `${item.name} size ${item.size} x ${item.quantity}  \n`)}
+          `,
+          price: billSubTotal - billDiscount,
+          address: customerData.stateProvinceRegion + ' ' + customerData.streetAddress,
+        }, 'user_DvQa1xBaJOLNZowfx4R9Y')
+          .then((result) => {
+
+            console.log(86, result.text);
+          }, (error) => {
+            console.log(88, error.text);
+          });
+
+        setCookie('cart', [], { path: '/' })
       }
-      else{
-          toast({
-              text: res.error.message,
-              type:"warning"
-          })
+      else {
+        toast({
+          text: res.error.message,
+          type: "warning"
+        })
       }
-      setCookie('cart', [], {path: '/'})
+      setCookie('cart', [], { path: '/' })
     }
   }
   // ------------------------ state - data ------------------------ //
@@ -398,431 +415,431 @@ const CheckOut = () => {
 
   return (
     <>
-    <Nav/>
-    <div
-      style={{
-        backgroundColor: "#f8f8f8",
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignContent: "start",
-        width: "100vw"
-      }}
-    >
-      {showBackToTop && (
-        <div
-          onClick={scrollToTop}
-          style={{
-            position: "fixed",
-            right: "30px",
-            bottom: "30px",
-            width: "30px",
-            height: "30px",
-            cursor: "pointer",
-            border: "1px solid black",
-            borderRadius: "100px",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center"
-          }}
-        >
-          <ArrowUp size={16} />
-        </div>
-      )}
-
-      <Cart open={cartMenu} onClose={() => setCartMenu(false)} isCheckout={true}/>
-      <Spacer w={15} />
+      <Nav />
       <div
-        className="checkout-left"
         style={{
+          backgroundColor: "#f8f8f8",
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "start",
-          alignItems: "center",
-          overflow: "hidden",
-          borderTop: "15px solid #f8f8f8",
-          borderLeft: "15px solid #f8f8f8",
-          width: "60%"
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignContent: "start",
+          width: "100vw"
         }}
       >
-        {current === 0 ? (
+        {showBackToTop && (
           <div
-            className="checkout-card"
+            onClick={scrollToTop}
             style={{
-              width: "100%",
-              marginBottom: "15px",
-              padding: "30px 0",
-              backgroundColor: "white",
-              overflow: "hidden"
+              position: "fixed",
+              right: "30px",
+              bottom: "30px",
+              width: "30px",
+              height: "30px",
+              cursor: "pointer",
+              border: "1px solid black",
+              borderRadius: "100px",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center"
             }}
           >
-            <div
-              className="checkout-card-title"
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                margin: "0 30px"
-              }}
-            >
-              <Text h4 style={{ cursor: "default" }}>
-                Information
-              </Text>
-              {havingData[0] && (
-                <div style={{ margin: "0 0 0.7rem 0" }}>
-                  <X
-                    className="checkout-card-title-btn"
-                    style={{ cursor: "pointer" }}
-                    size={20}
-                    onClick={onClickCancelInformation}
-                  />
-                </div>
-              )}
-            </div>
-            <div
-              onClick={() => {
-                setCurrentError(false);
-              }}
-              style={{ margin: "0 30px" }}
-            >
-              <CustomInput
-                label="First name"
-                initialValue={tempInformation.firstName}
-                required
-                onChange={(e) => {
-                  onChangeFirstName(e);
-                }}
-              />
-              <CustomInput
-                label="Email"
-                initialValue={tempInformation.email? customerData.email : ''}
-                required
-                onChange={(e) => {
-                  onChangeEmail(e);
-                }}
-              />
-              <CustomInput
-                label="Phone number"
-                initialValue={customerData.phone? customerData.phone : ''}
-                required
-                onChange={(e) => {
-                  onChangePhone(e);
-                }}
-              />
-            </div>
-            <div
-              className="checkout-button"
-              style={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              {currentError && (
-                <ErrorMessage message="Some fields are missing or invalid!" />
-              )}
-
-              <Button
-                auto
-                style={{
-                  width: "50%",
-                  maxWidth: 200,
-                  marginTop: 15,
-                  borderRadius: 0,
-                  backgroundColor: "white",
-                  border: "1px solid #eaeaea",
-                  color: "black"
-                }}
-                onClick={onClickSaveInformation}
-              >
-                Save
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div
-            className="checkout-card"
-            style={{
-              width: "100%",
-              marginBottom: "15px",
-              padding: "30px 0",
-              backgroundColor: "white",
-              overflow: "hidden"
-            }}
-          >
-            <div
-              className="checkout-card-title"
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                margin: "0 30px"
-              }}
-            >
-              <Text h4 style={{ cursor: "default" }}>
-                Information
-              </Text>
-              {havingData[0] && (
-                <div style={{ margin: "0 0 0.7rem 0" }}>
-                  <Edit3
-                    className="checkout-card-title-btn"
-                    style={{ cursor: "pointer" }}
-                    size={20}
-                    onClick={() => {
-                      setCurrent(0);
-                    }}
-                  />{" "}
-                </div>
-              )}
-            </div>
-            {havingData[0] && (
-              <div style={{ margin: "0 30px" }}>
-                <CustomField label="First name" value={information.firstName} />
-                <CustomField label="Last name" value={information.lastName} />
-                <CustomField label="Email" value={information.email} />
-                <CustomField label="Phone number" value={information.phone} />
-              </div>
-            )}
+            <ArrowUp size={16} />
           </div>
         )}
 
-        {current === 1 ? (
-          <div
-            className="checkout-card"
-            style={{
-              width: "100%",
-              marginBottom: "15px",
-              padding: "30px 0",
-              backgroundColor: "white",
-              overflow: "hidden"
-            }}
-          >
+        <Cart open={cartMenu} onClose={() => setCartMenu(false)} isCheckout={true} />
+        <Spacer w={15} />
+        <div
+          className="checkout-left"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "start",
+            alignItems: "center",
+            overflow: "hidden",
+            borderTop: "15px solid #f8f8f8",
+            borderLeft: "15px solid #f8f8f8",
+            width: "60%"
+          }}
+        >
+          {current === 0 ? (
             <div
-              className="checkout-card-title"
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                margin: "0 30px"
-              }}
-            >
-              <Text h4 style={{ cursor: "default" }}>
-                Billing address
-              </Text>
-              {havingData[1] && (
-                <div style={{ margin: "0 0 0.7rem 0" }}>
-                  <X
-                    className="checkout-card-title-btn"
-                    style={{ cursor: "pointer" }}
-                    size={20}
-                    onClick={onClickCancelBillingAddress}
-                  />
-                </div>
-              )}
-            </div>
-            <div
-              onClick={() => {
-                setCurrentError(false);
-              }}
-              style={{ margin: "0 30px" }}
-            >
-              <CustomInput
-                label="Street address"
-                initialValue={billingAddress.streetAddress}
-                required
-                secondaryLabel="Street address, P.O box, company name, c/o"
-                onChange={(e) => {
-                  onChangeStreetAddress(e);
-                }}
-              />
-              <CustomInput
-                label="Street address line 2"
-                initialValue={billingAddress.streetAddressLine2}
-                required={false}
-                secondaryLabel="Building, floor, apartment, suite, unit, etc."
-                onChange={(e) => {
-                  onChangeStreetAddressLine2(e);
-                }}
-              />
-              <CustomInput
-                label="City"
-                initialValue={billingAddress.city}
-                required
-                onChange={(e) => {
-                  onChangeCity(e);
-                }}
-              />
-              <CustomInput
-                label="State/Province/Region"
-                initialValue={billingAddress.stateProvinceRegion}
-                required
-                onChange={(e) => {
-                  onChangeStateProvinceRegion(e);
-                }}
-              />
-              <CustomInput
-                label="Country"
-                initialValue={billingAddress.country}
-                required
-                isSelect
-                onChange={(e) => {
-                  onChangeCountry(e);
-                }}
-              />
-              <CustomInput
-                label="Postal code"
-                initialValue={billingAddress.zip}
-                required
-                onChange={(e) => {
-                  onChangeZip(e);
-                }}
-              />
-            </div>
-            <div
-              className="checkout-button"
+              className="checkout-card"
               style={{
                 width: "100%",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center"
+                marginBottom: "15px",
+                padding: "30px 0",
+                backgroundColor: "white",
+                overflow: "hidden"
               }}
             >
-              {currentError && (
-                <ErrorMessage message="Some fields are missing or invalid!" />
-              )}
-              <Button
-                auto
+              <div
+                className="checkout-card-title"
                 style={{
-                  width: "50%",
-                  maxWidth: 200,
-                  marginTop: 15,
-                  borderRadius: 0,
-                  backgroundColor: "white",
-                  border: "1px solid #eaeaea",
-                  color: "black"
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  margin: "0 30px"
                 }}
-                onClick={onClickSaveBillingAddress}
               >
-                Save
-              </Button>
+                <Text h4 style={{ cursor: "default" }}>
+                  Information
+                </Text>
+                {havingData[0] && (
+                  <div style={{ margin: "0 0 0.7rem 0" }}>
+                    <X
+                      className="checkout-card-title-btn"
+                      style={{ cursor: "pointer" }}
+                      size={20}
+                      onClick={onClickCancelInformation}
+                    />
+                  </div>
+                )}
+              </div>
+              <div
+                onClick={() => {
+                  setCurrentError(false);
+                }}
+                style={{ margin: "0 30px" }}
+              >
+                <CustomInput
+                  label="First name"
+                  initialValue={tempInformation.firstName}
+                  required
+                  onChange={(e) => {
+                    onChangeFirstName(e);
+                  }}
+                />
+                <CustomInput
+                  label="Email"
+                  initialValue={tempInformation.email ? customerData.email : ''}
+                  required
+                  onChange={(e) => {
+                    onChangeEmail(e);
+                  }}
+                />
+                <CustomInput
+                  label="Phone number"
+                  initialValue={customerData.phone ? customerData.phone : ''}
+                  required
+                  onChange={(e) => {
+                    onChangePhone(e);
+                  }}
+                />
+              </div>
+              <div
+                className="checkout-button"
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                {currentError && (
+                  <ErrorMessage message="Some fields are missing or invalid!" />
+                )}
+
+                <Button
+                  auto
+                  style={{
+                    width: "50%",
+                    maxWidth: 200,
+                    marginTop: 15,
+                    borderRadius: 0,
+                    backgroundColor: "white",
+                    border: "1px solid #eaeaea",
+                    color: "black"
+                  }}
+                  onClick={onClickSaveInformation}
+                >
+                  Save
+                </Button>
+              </div>
             </div>
-          </div>
-        ) : (
-          <div
-            className="checkout-card"
-            style={{
-              width: "100%",
-              marginBottom: "15px",
-              padding: "30px 0",
-              backgroundColor: "white",
-              overflow: "hidden"
-            }}
-          >
+          ) : (
             <div
-              className="checkout-card-title"
+              className="checkout-card"
               style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                margin: "0 30px"
+                width: "100%",
+                marginBottom: "15px",
+                padding: "30px 0",
+                backgroundColor: "white",
+                overflow: "hidden"
               }}
             >
-              <Text h4 style={{ cursor: "default" }}>
-                Billing address
-              </Text>
-              {havingData[1] && (
-                <div style={{ margin: "0 0 0.7rem 0" }}>
-                  <Edit3
-                    className="checkout-card-title-btn"
-                    style={{ cursor: "pointer" }}
-                    size={20}
-                    onClick={() => {
-                      setCurrent(1);
-                    }}
-                  />{" "}
+              <div
+                className="checkout-card-title"
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  margin: "0 30px"
+                }}
+              >
+                <Text h4 style={{ cursor: "default" }}>
+                  Information
+                </Text>
+                {havingData[0] && (
+                  <div style={{ margin: "0 0 0.7rem 0" }}>
+                    <Edit3
+                      className="checkout-card-title-btn"
+                      style={{ cursor: "pointer" }}
+                      size={20}
+                      onClick={() => {
+                        setCurrent(0);
+                      }}
+                    />{" "}
+                  </div>
+                )}
+              </div>
+              {havingData[0] && (
+                <div style={{ margin: "0 30px" }}>
+                  <CustomField label="First name" value={information.firstName} />
+                  <CustomField label="Last name" value={information.lastName} />
+                  <CustomField label="Email" value={information.email} />
+                  <CustomField label="Phone number" value={information.phone} />
                 </div>
               )}
             </div>
-            {havingData[1] && (
-              <div style={{ margin: "0 30px" }}>
-                <CustomField
+          )}
+
+          {current === 1 ? (
+            <div
+              className="checkout-card"
+              style={{
+                width: "100%",
+                marginBottom: "15px",
+                padding: "30px 0",
+                backgroundColor: "white",
+                overflow: "hidden"
+              }}
+            >
+              <div
+                className="checkout-card-title"
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  margin: "0 30px"
+                }}
+              >
+                <Text h4 style={{ cursor: "default" }}>
+                  Billing address
+                </Text>
+                {havingData[1] && (
+                  <div style={{ margin: "0 0 0.7rem 0" }}>
+                    <X
+                      className="checkout-card-title-btn"
+                      style={{ cursor: "pointer" }}
+                      size={20}
+                      onClick={onClickCancelBillingAddress}
+                    />
+                  </div>
+                )}
+              </div>
+              <div
+                onClick={() => {
+                  setCurrentError(false);
+                }}
+                style={{ margin: "0 30px" }}
+              >
+                <CustomInput
                   label="Street address"
-                  value={billingAddress.streetAddress}
+                  initialValue={billingAddress.streetAddress}
+                  required
+                  secondaryLabel="Street address, P.O box, company name, c/o"
+                  onChange={(e) => {
+                    onChangeStreetAddress(e);
+                  }}
                 />
-                <CustomField
+                <CustomInput
                   label="Street address line 2"
-                  value={billingAddress.streetAddressLine2}
+                  initialValue={billingAddress.streetAddressLine2}
+                  required={false}
+                  secondaryLabel="Building, floor, apartment, suite, unit, etc."
+                  onChange={(e) => {
+                    onChangeStreetAddressLine2(e);
+                  }}
                 />
-                <CustomField
+                <CustomInput
                   label="City"
-                  value={billingAddress.city}
+                  initialValue={billingAddress.city}
                   required
+                  onChange={(e) => {
+                    onChangeCity(e);
+                  }}
                 />
-                <CustomField
+                <CustomInput
                   label="State/Province/Region"
-                  value={billingAddress.stateProvinceRegion}
-                />
-                <CustomField label="Country" value={billingAddress.country} />
-                <CustomField
-                  label="Postal code"
-                  value={billingAddress.zip}
+                  initialValue={billingAddress.stateProvinceRegion}
                   required
+                  onChange={(e) => {
+                    onChangeStateProvinceRegion(e);
+                  }}
+                />
+                <CustomInput
+                  label="Country"
+                  initialValue={billingAddress.country}
+                  required
+                  isSelect
+                  onChange={(e) => {
+                    onChangeCountry(e);
+                  }}
+                />
+                <CustomInput
+                  label="Postal code"
+                  initialValue={billingAddress.zip}
+                  required
+                  onChange={(e) => {
+                    onChangeZip(e);
+                  }}
                 />
               </div>
-            )}
-          </div>
-        )}
-        {current === 2 ? (
-          <div
-            className="checkout-card"
-            style={{
-              width: "100%",
-              marginBottom: "15px",
-              padding: "30px 0",
-              backgroundColor: "white",
-              overflow: "hidden"
-            }}
-          >
+              <div
+                className="checkout-button"
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                {currentError && (
+                  <ErrorMessage message="Some fields are missing or invalid!" />
+                )}
+                <Button
+                  auto
+                  style={{
+                    width: "50%",
+                    maxWidth: 200,
+                    marginTop: 15,
+                    borderRadius: 0,
+                    backgroundColor: "white",
+                    border: "1px solid #eaeaea",
+                    color: "black"
+                  }}
+                  onClick={onClickSaveBillingAddress}
+                >
+                  Save
+                </Button>
+              </div>
+            </div>
+          ) : (
             <div
-              className="checkout-card-title"
+              className="checkout-card"
               style={{
-                marginBottom: 12,
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                margin: "0 30px"
+                width: "100%",
+                marginBottom: "15px",
+                padding: "30px 0",
+                backgroundColor: "white",
+                overflow: "hidden"
               }}
             >
-              <Text h4 style={{ cursor: "default" }}>
-                Shipping
-              </Text>
-              {havingData[2] && (
-                <div style={{ margin: "0 0 0.7rem 0" }}>
-                  <X
-                    className="checkout-card-title-btn"
-                    style={{ cursor: "pointer" }}
-                    size={20}
-                    onClick={onClickCancelShipping}
+              <div
+                className="checkout-card-title"
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  margin: "0 30px"
+                }}
+              >
+                <Text h4 style={{ cursor: "default" }}>
+                  Billing address
+                </Text>
+                {havingData[1] && (
+                  <div style={{ margin: "0 0 0.7rem 0" }}>
+                    <Edit3
+                      className="checkout-card-title-btn"
+                      style={{ cursor: "pointer" }}
+                      size={20}
+                      onClick={() => {
+                        setCurrent(1);
+                      }}
+                    />{" "}
+                  </div>
+                )}
+              </div>
+              {havingData[1] && (
+                <div style={{ margin: "0 30px" }}>
+                  <CustomField
+                    label="Street address"
+                    value={billingAddress.streetAddress}
+                  />
+                  <CustomField
+                    label="Street address line 2"
+                    value={billingAddress.streetAddressLine2}
+                  />
+                  <CustomField
+                    label="City"
+                    value={billingAddress.city}
+                    required
+                  />
+                  <CustomField
+                    label="State/Province/Region"
+                    value={billingAddress.stateProvinceRegion}
+                  />
+                  <CustomField label="Country" value={billingAddress.country} />
+                  <CustomField
+                    label="Postal code"
+                    value={billingAddress.zip}
+                    required
                   />
                 </div>
               )}
             </div>
-            <Radio.Group value={tempShippingIdx} onChange={onChangeShipping}>
-              {shippingData.map((item, index) => (
-                <div
-                  key={index}
-                  style={
-                    tempShippingIdx === index
-                      ? {
+          )}
+          {current === 2 ? (
+            <div
+              className="checkout-card"
+              style={{
+                width: "100%",
+                marginBottom: "15px",
+                padding: "30px 0",
+                backgroundColor: "white",
+                overflow: "hidden"
+              }}
+            >
+              <div
+                className="checkout-card-title"
+                style={{
+                  marginBottom: 12,
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  margin: "0 30px"
+                }}
+              >
+                <Text h4 style={{ cursor: "default" }}>
+                  Shipping
+                </Text>
+                {havingData[2] && (
+                  <div style={{ margin: "0 0 0.7rem 0" }}>
+                    <X
+                      className="checkout-card-title-btn"
+                      style={{ cursor: "pointer" }}
+                      size={20}
+                      onClick={onClickCancelShipping}
+                    />
+                  </div>
+                )}
+              </div>
+              <Radio.Group value={tempShippingIdx} onChange={onChangeShipping}>
+                {shippingData.map((item, index) => (
+                  <div
+                    key={index}
+                    style={
+                      tempShippingIdx === index
+                        ? {
                           backgroundColor: "white",
                           height: "100px",
                           display: "flex",
@@ -837,7 +854,7 @@ const CheckOut = () => {
                           minWidth: "200px",
                           outline: "1px solid black"
                         }
-                      : {
+                        : {
                           backgroundColor: "white",
                           height: "100px",
                           display: "flex",
@@ -852,423 +869,423 @@ const CheckOut = () => {
                           minWidth: "200px",
                           outline: "1px solid #eaeaea"
                         }
-                  }
-                  onClick={() => onChangeShipping(index)}
+                    }
+                    onClick={() => onChangeShipping(index)}
+                  >
+                    <Radio scale={4 / 3} value={index}>
+                      <Spacer w={2} />
+                      <div syle={{ display: "flex", flexDirection: "column" }}>
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            fontWeight: 500,
+                            color: "gray"
+                          }}
+                        >
+                          {item.name}
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            marginTop: -10
+                          }}
+                        >
+                          ${item.fee.toFixed(2)}
+                          {" · "}
+                          {item.minDay}
+                          {"-"}
+                          {item.maxDay}
+                          {" days"}
+                        </Text>
+                        <Text
+                          style={{
+                            fontSize: 12,
+                            marginTop: -10,
+                            color: "gray"
+                          }}
+                        >
+                          Order by {getShippingDay(item.order)}
+                          {", "} receive by {getShippingDay(item.maxDay)}
+                        </Text>
+                      </div>
+                    </Radio>
+                  </div>
+                ))}
+              </Radio.Group>
+              <div
+                className="checkout-button"
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+              >
+                <Button
+                  auto
+                  style={{
+                    width: "50%",
+                    maxWidth: 200,
+                    marginTop: 15,
+                    borderRadius: 0,
+                    backgroundColor: "white",
+                    border: "1px solid #eaeaea",
+                    color: "black"
+                  }}
+                  onClick={onClickSaveShipping}
                 >
-                  <Radio scale={4 / 3} value={index}>
-                    <Spacer w={2} />
-                    <div syle={{ display: "flex", flexDirection: "column" }}>
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 500,
-                          color: "gray"
-                        }}
-                      >
-                        {item.name}
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          marginTop: -10
-                        }}
-                      >
-                        ${item.fee.toFixed(2)}
-                        {" · "}
-                        {item.minDay}
-                        {"-"}
-                        {item.maxDay}
-                        {" days"}
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          marginTop: -10,
-                          color: "gray"
-                        }}
-                      >
-                        Order by {getShippingDay(item.order)}
-                        {", "} receive by {getShippingDay(item.maxDay)}
-                      </Text>
-                    </div>
-                  </Radio>
-                </div>
-              ))}
-            </Radio.Group>
+                  Save
+                </Button>
+              </div>
+            </div>
+          ) : (
             <div
-              className="checkout-button"
+              className="checkout-card"
               style={{
                 width: "100%",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center"
+                marginBottom: "15px",
+                padding: "30px 0",
+                backgroundColor: "white",
+                overflow: "hidden"
               }}
             >
-              <Button
-                auto
+              <div
+                className="checkout-card-title"
                 style={{
-                  width: "50%",
-                  maxWidth: 200,
-                  marginTop: 15,
-                  borderRadius: 0,
-                  backgroundColor: "white",
-                  border: "1px solid #eaeaea",
-                  color: "black"
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  margin: "0 30px"
                 }}
-                onClick={onClickSaveShipping}
               >
-                Save
-              </Button>
+                <Text h4 style={{ cursor: "default" }}>
+                  Shipping
+                </Text>
+                {havingData[2] && (
+                  <div style={{ margin: "0 0 0.7rem 0" }}>
+                    <Edit3
+                      className="checkout-card-title-btn"
+                      style={{ cursor: "pointer" }}
+                      size={20}
+                      onClick={() => {
+                        setCurrent(2);
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+              {havingData[2] && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    margin: "0 30px"
+                  }}
+                >
+                  <CustomField
+                    label={
+                      shippingData[shippingIdx].name +
+                      " · " +
+                      shippingData[shippingIdx].minDay +
+                      "-" +
+                      shippingData[shippingIdx].maxDay +
+                      " days"
+                    }
+                    value={
+                      "Order by " +
+                      getShippingDay(shippingData[shippingIdx].order) +
+                      ", receive by " +
+                      getShippingDay(shippingData[shippingIdx].maxDay)
+                    }
+                    required
+                  />
+                </div>
+              )}
             </div>
-          </div>
-        ) : (
+          )}
+        </div>
+        <div
+          className="checkout-right"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "start",
+            alignItems: "center",
+            overflow: "hidden",
+            borderTop: "15px solid #f8f8f8",
+            borderLeft: "15px solid #f8f8f8",
+            width: "40%",
+            borderRight: "15px solid #f8f8f8"
+          }}
+        >
           <div
             className="checkout-card"
             style={{
               width: "100%",
               marginBottom: "15px",
-              padding: "30px 0",
               backgroundColor: "white",
               overflow: "hidden"
             }}
           >
-            <div
-              className="checkout-card-title"
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                margin: "0 30px"
-              }}
-            >
-              <Text h4 style={{ cursor: "default" }}>
-                Shipping
-              </Text>
-              {havingData[2] && (
-                <div style={{ margin: "0 0 0.7rem 0" }}>
-                  <Edit3
-                    className="checkout-card-title-btn"
-                    style={{ cursor: "pointer" }}
-                    size={20}
-                    onClick={() => {
-                      setCurrent(2);
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-            {havingData[2] && (
+            <div style={{ margin: "30px" }}>
               <div
                 style={{
+                  width: "100%",
                   display: "flex",
-                  flexDirection: "column",
-                  margin: "0 30px"
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "30px"
                 }}
               >
-                <CustomField
-                  label={
-                    shippingData[shippingIdx].name +
-                    " · " +
-                    shippingData[shippingIdx].minDay +
-                    "-" +
-                    shippingData[shippingIdx].maxDay +
-                    " days"
-                  }
-                  value={
-                    "Order by " +
-                    getShippingDay(shippingData[shippingIdx].order) +
-                    ", receive by " +
-                    getShippingDay(shippingData[shippingIdx].maxDay)
-                  }
-                  required
-                />
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-      <div
-        className="checkout-right"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "start",
-          alignItems: "center",
-          overflow: "hidden",
-          borderTop: "15px solid #f8f8f8",
-          borderLeft: "15px solid #f8f8f8",
-          width: "40%",
-          borderRight: "15px solid #f8f8f8"
-        }}
-      >
-        <div
-          className="checkout-card"
-          style={{
-            width: "100%",
-            marginBottom: "15px",
-            backgroundColor: "white",
-            overflow: "hidden"
-          }}
-        >
-          <div style={{ margin: "30px" }}>
-            <div
-              style={{
-                width: "100%",
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "30px"
-              }}
-            >
-              {isApplied > 0 ? (
-                <>
-                  <Input
-                    scale={4 / 3}
-                    width="100%"
-                    readOnly
-                    style={{ cursor: "default", pointerEvents: "none" }}
-                    initialValue={voucherCode}
-                  />
+                {isApplied > 0 ? (
+                  <>
+                    <Input
+                      scale={4 / 3}
+                      width="100%"
+                      readOnly
+                      style={{ cursor: "default", pointerEvents: "none" }}
+                      initialValue={voucherCode}
+                    />
 
-                  <Spacer w={1} />
-                  <Button
-                    auto
-                    style={{
-                      borderRadius: 0,
-                      textTransform: "none",
-                      width: "225px",
-                      color: "black",
-                      border: "1px solid #eaeaea"
-                    }}
-                    onClick={onClickRemoveVoucher}
-                  >
-                    Remove voucher
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Input
-                    scale={4 / 3}
-                    width="100%"
-                    type={isApplied < 0 ? "error" : null}
-                    value={voucherCode}
-                    placeholder="Enter code"
-                    style={{ cursor: "default" }}
-                    onClick={() => setIsApplied(0)}
-                    onChange={(e) => onChangeVoucher(e.target.value)}
-                  />
-                  <Spacer w={1} />
-                  <Button
-                    auto
-                    style={{
-                      borderRadius: 0,
-                      textTransform: "none",
-                      width: "225px",
-                      backgroundColor: "white",
-                      color: "black",
-                      border: "1px solid #eaeaea"
-                    }}
-                    onClick={onClickApplyVoucher}
-                  >
-                    Apply voucher
-                  </Button>
-                </>
-              )}
-            </div>
-            <div
-              style={{
-                width: "100%",
-                height: "1px",
-                borderBottom: "1px solid gray",
-                margin: "15px 0"
-              }}
-            />
-            <div
-              className="checkout-bill-detail"
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}
-            >
-              <Text
+                    <Spacer w={1} />
+                    <Button
+                      auto
+                      style={{
+                        borderRadius: 0,
+                        textTransform: "none",
+                        width: "225px",
+                        color: "black",
+                        border: "1px solid #eaeaea"
+                      }}
+                      onClick={onClickRemoveVoucher}
+                    >
+                      Remove voucher
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Input
+                      scale={4 / 3}
+                      width="100%"
+                      type={isApplied < 0 ? "error" : null}
+                      value={voucherCode}
+                      placeholder="Enter code"
+                      style={{ cursor: "default" }}
+                      onClick={() => setIsApplied(0)}
+                      onChange={(e) => onChangeVoucher(e.target.value)}
+                    />
+                    <Spacer w={1} />
+                    <Button
+                      auto
+                      style={{
+                        borderRadius: 0,
+                        textTransform: "none",
+                        width: "225px",
+                        backgroundColor: "white",
+                        color: "black",
+                        border: "1px solid #eaeaea"
+                      }}
+                      onClick={onClickApplyVoucher}
+                    >
+                      Apply voucher
+                    </Button>
+                  </>
+                )}
+              </div>
+              <div
                 style={{
-                  fontSize: 12,
-                  fontWeight: 500,
-                  color: "gray",
-                  cursor: "default"
-                }}
-              >
-                Sub total
-              </Text>
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: 500,
-                  cursor: "default"
-                }}
-              >
-                {billSubTotal.toFixed(2)} VND
-              </Text>
-            </div>
-            <div
-              className="checkout-bill-detail"
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 12,
-                  fontWeight: 500,
-                  color: "gray",
-                  cursor: "default"
-                }}
-              >
-                Discount
-              </Text>
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: 500,
-                  cursor: "default",
-                  color: "red"
-                }}
-              >
-                - {billDiscount.toFixed(2)} VND
-              </Text>
-            </div>
-            <div
-              className="checkout-bill-detail"
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 12,
-                  fontWeight: 500,
-                  color: "gray",
-                  cursor: "default"
-                }}
-              >
-                Shipping
-              </Text>
-              <Text
-                style={{
-                  fontSize: 14,
-                  fontWeight: 500,
-                  cursor: "default"
-                }}
-              >
-                {havingData[2]
-                  ? "$" + shippingData[shippingIdx].fee.toFixed(2)
-                  : "TBD"}
-              </Text>
-            </div>
-            <div
-              style={{
-                width: "100%",
-                height: "1px",
-                borderBottom: "1px solid gray",
-                margin: "15px 0"
-              }}
-            />
-            <div
-              className="checkout-bill-detail"
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: 500,
-                  cursor: "default"
-                }}
-              >
-                Total
-              </Text>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: 500,
-                  cursor: "default"
-                }}
-              >
-                {billSubTotal - billDiscount}
-              </Text>
-            </div>
-            <div
-              className="checkout-bill-detail"
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}
-            >
-              <Button
-                auto
-                style={{
-                  textTransform: "none",
                   width: "100%",
-                  backgroundColor: "white",
-                  color: "black",
-                  border: 0,
-                  fontSize: 12,
-                  fontWeight: 500,
-                  textDecoration: "underline"
+                  height: "1px",
+                  borderBottom: "1px solid gray",
+                  margin: "15px 0"
                 }}
-                onClick={() => setCartMenu(true)}
-              >
-                View your cart
-              </Button>
-            </div>
-            <div
-              className="checkout-bill-detail"
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}
-            >
-              <Button
-                className="checkout-btn"
+              />
+              <div
+                className="checkout-bill-detail"
                 style={{
-                  borderRadius: 0,
-                  textTransform: "none",
-                  marginTop: 15,
-                  width: "100%",
-                  height: "50px",
-                  backgroundColor: "black",
-                  color: "white",
-                  border: 0
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center"
                 }}
-                onClick={() => Purchase()}
               >
-                Complete your purchase
-              </Button>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 500,
+                    color: "gray",
+                    cursor: "default"
+                  }}
+                >
+                  Sub total
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 500,
+                    cursor: "default"
+                  }}
+                >
+                  {billSubTotal.toFixed(2)} VND
+                </Text>
+              </div>
+              <div
+                className="checkout-bill-detail"
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center"
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 500,
+                    color: "gray",
+                    cursor: "default"
+                  }}
+                >
+                  Discount
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 500,
+                    cursor: "default",
+                    color: "red"
+                  }}
+                >
+                  - {billDiscount.toFixed(2)} VND
+                </Text>
+              </div>
+              <div
+                className="checkout-bill-detail"
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center"
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 500,
+                    color: "gray",
+                    cursor: "default"
+                  }}
+                >
+                  Shipping
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 500,
+                    cursor: "default"
+                  }}
+                >
+                  {havingData[2]
+                    ? "$" + shippingData[shippingIdx].fee.toFixed(2)
+                    : "TBD"}
+                </Text>
+              </div>
+              <div
+                style={{
+                  width: "100%",
+                  height: "1px",
+                  borderBottom: "1px solid gray",
+                  margin: "15px 0"
+                }}
+              />
+              <div
+                className="checkout-bill-detail"
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center"
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 500,
+                    cursor: "default"
+                  }}
+                >
+                  Total
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 500,
+                    cursor: "default"
+                  }}
+                >
+                  {billSubTotal - billDiscount}
+                </Text>
+              </div>
+              <div
+                className="checkout-bill-detail"
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center"
+                }}
+              >
+                <Button
+                  auto
+                  style={{
+                    textTransform: "none",
+                    width: "100%",
+                    backgroundColor: "white",
+                    color: "black",
+                    border: 0,
+                    fontSize: 12,
+                    fontWeight: 500,
+                    textDecoration: "underline"
+                  }}
+                  onClick={() => setCartMenu(true)}
+                >
+                  View your cart
+                </Button>
+              </div>
+              <div
+                className="checkout-bill-detail"
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center"
+                }}
+              >
+                <Button
+                  className="checkout-btn"
+                  style={{
+                    borderRadius: 0,
+                    textTransform: "none",
+                    marginTop: 15,
+                    width: "100%",
+                    height: "50px",
+                    backgroundColor: "black",
+                    color: "white",
+                    border: 0
+                  }}
+                  onClick={() => Purchase()}
+                >
+                  Complete your purchase
+                </Button>
+              </div>
             </div>
           </div>
         </div>
+        <Spacer w={15} />
       </div>
-      <Spacer w={15} />
-    </div>
     </>
   );
 };
